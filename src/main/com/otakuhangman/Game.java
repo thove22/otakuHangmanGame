@@ -40,7 +40,17 @@ public class Game {
 
     private  void handleMenuChoice(int userChoice){
         switch (userChoice){
-            case 1: exitGame();
+            case 1:
+                //  startNewGame();
+                  break;
+            case 2:
+               //   continueGame();
+                  break;
+            case 3:
+              //    showInstrutions();
+                  break;
+            case 4:
+                   exitGame();
                    break;
             default:
                     System.out.println("Opcao Invalida!!!");
@@ -48,7 +58,7 @@ public class Game {
     }
 
     private void exitGame(){
-        System.out.println("Obriagdo por Jogar o Otaku HangMan, Sayounara!!!!");
+        System.out.println("Obriagdo por Jogar o Otaku HangMan, Sayonara minna-san!ᕦ(ò_óˇ)ᕤ");
         System.exit(0);
     }
 }
