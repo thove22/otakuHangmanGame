@@ -2,52 +2,56 @@ package main.com.otakuhangman;
 
 public class Player {
     private String name;
-    private int score;
-    private Rank rank;
+    private int currentLevelScore;
+    private int currentStreak;
+    private int totalPoints;
     private int currentLevel;
+    private int completedChalenges;
+    private Rank rank;
 
-    public Player(String name){
-        this(name, 0, Rank.INICIANTE,0);
+    public  Player(String name){
+        this(name, 1, 0, 0, 0, 0, Rank.OTAKU_INICIANTE);
     }
-    public Player(String name, int score, Rank rank, int currentLevel){
+
+    public Player(String name,int currentLevelScore, int currentStreak , int totalPoints,
+                  int currentLevel, int completedChalenges, Rank rank){
+
         this.name = name;
-        this.score = score;
+        this.currentLevelScore = currentLevelScore;
+        this.currentStreak = currentStreak;
+        this.totalPoints = totalPoints;
+        this.completedChalenges = completedChalenges;
         this.rank = rank;
         this.currentLevel = currentLevel;
     }
 
-    public String getName(){
-        return this.name;
-    }
-    public int getScore(){
-        return this.score;
-    }
-    public Rank getRank(){
-        return this.rank;
-    }
-    public int getCurrentLevel(){return this.currentLevel;}
+    public String getName() {return name;}
 
-    public void setName(String name){
-        this.name = name;
-    }
-    private void addPoints(int points){
-        this.score += points;
-        updateRank(score);
-    }
-    private void updateLevel(){
+    public int getCurrentLevelScore() {return currentLevelScore;}
 
+    public void setCurrentLevelScore(int currentLevelScore) {this.currentLevelScore = currentLevelScore;}
+
+    public int getCurrentStreak() {return currentStreak;}
+
+    public void setCurrentStreak(int currentStreak) {this.currentStreak = currentStreak;}
+
+    public int getTotalPoints() {return totalPoints;}
+
+    public void setTotalPoints(int totalPoints) {this.totalPoints = totalPoints;}
+
+    public void setCurrentLevel(int currentLevel) {this.currentLevel = currentLevel;}
+
+    public int getCompletedChalenges() {return completedChalenges;}
+
+    public void setCompletedChalenges(int completedChalenges) {this.completedChalenges = completedChalenges;}
+
+    public Rank getRank() {return rank;}
+
+    public void setRank(Rank rank) {this.rank = rank;}
+
+    public int getCurrentLevel(){
+        return this.currentLevel;
     }
-    private void updateRank(int score){
-        if(score < 300){
-            this.rank = Rank.INICIANTE;
-        }else if(score < 600){
-            this.rank = Rank.NUTELLA;
-        }else if(score < 1200){
-            this.rank = Rank.MID_OTAKU;
-        }else{
-            this.rank = Rank.ADVANCED_OTAKU;
-        }else{
-            this.rank = Rank.GOD_OTAKU;
-        }
-    }
+
+
 }
