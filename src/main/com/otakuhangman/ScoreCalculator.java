@@ -18,4 +18,30 @@ public class ScoreCalculator {
 
         throw new IllegalStateException("Score nao Encontrado para o Erro");
     }
+
+    public static double getStreakMultiplier(int currentStreak){
+        if(currentStreak < 0 ){
+            throw new IllegalArgumentException(
+                    "Current Streak:" + currentStreak + ". Streak negativa não faz sentido conceitualmente."
+            );
+        }
+        switch (currentStreak){
+            case 0:
+            case 1:
+                return 1.0;
+            case 2:
+                return 1.2;
+            case 3:
+                return 1.5;
+            default:
+                return 2.0;
+        }
+    }
+
+    public static int calculateFinalPoints(int errors, int currentStreak){
+
+      return (int) Math.round(getStreakMultiplier(currentStreak) * calculateBaseScore(errors));
+
+    }
+
 }
