@@ -15,7 +15,6 @@ public class ScoreCalculator {
                 return scoreBase.getScore();
             }
         }
-
         throw new IllegalStateException("Score nao Encontrado para o Erro");
     }
 

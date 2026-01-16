@@ -16,7 +16,6 @@ public enum ScoreBase {
        this.errors = errors;
        this.score = score;
    }
-
     public int getErrors() {
         return errors;
     }
