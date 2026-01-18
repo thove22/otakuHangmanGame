@@ -1,7 +1,22 @@
 package main.com.otakuhangman;
 import java.io.*;
+import java.util.List;
 
 public class Game {
+
+    private Player currentPlayer;
+    private List<Level> levels;
+    private int currentLevelIndex;
+    private boolean isPlaying;
+
+    public Player getCurrentPlayer() {return currentPlayer;}
+    public void setCurrentPlayer(Player currentPlayer) {this.currentPlayer = currentPlayer;}
+    public List<Level> getLevels() {return levels;}
+    public void setLevels(List<Level> levels) {this.levels = levels;}
+    public int getCurrentLevelIndex() {return currentLevelIndex;}
+    public void setCurrentLevelIndex(int currentLevelIndex) {this.currentLevelIndex = currentLevelIndex;}
+    public boolean isPlaying() {return isPlaying;}
+    public void setPlaying(boolean playing) {isPlaying = playing;}
 
     public  void start(){
         int userChoice  = displayMenu();
@@ -57,7 +72,7 @@ public class Game {
         }
     }
 
-    private void exitGame(){
+    void exitGame(){
         System.out.println("Obriagdo por Jogar o Otaku HangMan, Sayonara minna-san!ᕦ(ò_óˇ)ᕤ");
         System.exit(0);
     }
