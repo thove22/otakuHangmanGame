@@ -56,7 +56,7 @@ public class Game {
     private  void handleMenuChoice(int userChoice){
         switch (userChoice){
             case 1:
-                //  startNewGame();
+                 startNewGame();
                   break;
             case 2:
                //   continueGame();
@@ -71,7 +71,37 @@ public class Game {
                     System.out.println("Opcao Invalida!!!");
         }
     }
+    void startNewGame(){
+        try {
+            BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
+            String name = getValidPlayerName(br);
+            currentPlayer = new Player(name);
+            currentLevelIndex = 0;
+            //playCurrentLevel
+        } catch (IOException e) {
+            System.out.println("Erro de Entrada: " + e.getMessage());
+        }
+    }
+    String getValidPlayerName(BufferedReader br) throws IOException{
+        while (true){
+            System.out.println("Insira seu nome de jogador: ");
+            String name = br.readLine().trim();
+
+            if(name.isEmpty()){
+                return "Player_" + (int)(Math.random() * 1000);
+            }
+            if (name.length() < 2 || name.length() > 20){
+                System.out.println(" O Nome deve ter entre 2 e 20 caracteres.");
+                continue;
+            }
+            if (name.matches("^[a-zA-Z0-9_\\-\\s]+$")){
+                System.out.println("Use apenas letras, números, espaços, hífen ou underscore");
+                continue;
+            }
+            return name;
+        }
+    }
     void exitGame(){
         System.out.println("Obriagdo por Jogar o Otaku HangMan, Sayonara minna-san!ᕦ(ò_óˇ)ᕤ");
         System.exit(0);

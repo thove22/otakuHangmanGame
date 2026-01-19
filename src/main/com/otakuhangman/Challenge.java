@@ -94,5 +94,13 @@ public class Challenge {
         return currentErrors;
     }
 
+    void reset(){
+        this.triedLetters.clear();
+        this.currentErrors = 0;
+
+        for (int i = 0 ; i < discoveredPositions.length; i++){
+            discoveredPositions[i] = false;
+        }
+    }
 
 }
