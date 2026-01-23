@@ -76,6 +76,7 @@ public class Game {
 
             String name = getValidPlayerName(br);
             currentPlayer = new Player(name);
+            levels = GameData.createLevels();
             currentLevelIndex = 0;
             playCurrentLevel();
         } catch (IOException e) {
@@ -210,7 +211,28 @@ public class Game {
                 "--  Desafios mínimos: " + level.getRequiredChallengesToPass() + "\n";
     }
 
-
+    void showInstrutions(){
+        System.out.println("\n=========== COMO JOGAR ===========");
+        System.out.println("Bem-vindo ao Otaku Hangman!");
+        System.out.println();
+        System.out.println("Objetivo:");
+        System.out.println("- Adivinhar a palavra secreta, uma letra por vez.");
+        System.out.println();
+        System.out.println("Regras:");
+        System.out.println("- Insira apenas UMA letra por tentativa.");
+        System.out.println("- Letras repetidas não contam como nova tentativa.");
+        System.out.println("- Cada erro adiciona uma parte ao boneco da forca.");
+        System.out.println("- Com 6 erros, o desafio é perdido.");
+        System.out.println();
+        System.out.println("Progressão:");
+        System.out.println("- Cada nível possui vários desafios.");
+        System.out.println("- Você precisa atingir o score mínimo para avançar.");
+        System.out.println("- Nos primeiros níveis, você pode avançar mesmo falhando.");
+        System.out.println("- A partir de níveis mais altos, será preciso dominar o jogo!");
+        System.out.println();
+        System.out.println("Boa sorte e divirta-se! (⌐■_■)");
+        System.out.println("=================================\n");
+    }
     void exitGame(){
         System.out.println("Obriagdo por Jogar o Otaku HangMan, Sayonara minna-san!ᕦ(ò_óˇ)ᕤ");
         System.exit(0);
