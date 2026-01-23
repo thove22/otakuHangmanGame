@@ -13,8 +13,8 @@ public class Level {
       }
       this.levelNumber = levelNumber;
       this.challenges = challenges;
-      requiredChallengesToPass =  calculateMinScoreToPass() ;
-      requiredScoreToPass = calculateMinChallengesToPass()  ;
+      requiredChallengesToPass =  calculateMinChallengesToPass();
+      requiredScoreToPass = calculateMinScoreToPass()  ;
    }
 
    public int getLevelNumber() {
@@ -71,4 +71,5 @@ public class Level {
       }
       return score;
    }
+
 }

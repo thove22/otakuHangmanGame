@@ -1,7 +1,7 @@
 package main.com.otakuhangman;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class Challenge {
     private String word;
@@ -78,6 +78,15 @@ public class Challenge {
         }
         return found;
     }
+    String getTriedLettersString(){
+        if(triedLetters.isEmpty()){
+            return "Nenhuma letra tentada";
+        }
+        List<Character> sorted = new ArrayList<>(triedLetters);
+        Collections.sort(sorted);
+
+        return sorted.stream().map(String::valueOf).collect(Collectors.joining(", "));
+    }
 
     boolean isWon(){
         for(int i = 0; i < normalizedWord.length(); i++){
@@ -107,9 +116,11 @@ public class Challenge {
         }
     }
     String getStatus(){
-        return  "Palavra: " + getMaskedWord() +
-                "\nLetras Tentadas: " + triedLetters +
-                "\nErros: " + currentErrors + " / " + MAX_ERRORS;
+        return  "=========================================\n"+
+                "Palavra: " + getMaskedWord() + "\n"+
+                "Letras Tentadas: " + triedLetters + "\n" +
+                "Erros: " + currentErrors + " / " + MAX_ERRORS + "\n"+
+                "=========================================";
     }
     @Override
     public String toString() {

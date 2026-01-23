@@ -38,7 +38,7 @@ public class Player {
     public void setRank(Rank rank) {this.rank = rank;}
     public int getCurrentLevel(){return this.currentLevel;}
 
-    int processChallenge(int errors){
+    private int processChallenge(int errors){
         int points = 0;
 
         if (errors < 0 || errors > 6){
