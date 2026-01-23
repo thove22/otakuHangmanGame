@@ -1,8 +1,6 @@
 package main.com.otakuhangman;
 import java.io.*;
-import java.nio.charset.Charset;
 import java.util.List;
-import java.util.Set;
 
 public class Game {
     private Player currentPlayer;
@@ -63,7 +61,7 @@ public class Game {
                //   continueGame();
                   break;
             case 3:
-              //    showInstrutions();
+                 showInstrutions();
                   break;
             case 4:
                    exitGame();
@@ -121,9 +119,10 @@ public class Game {
                     char letter = getTriedLetter(br);
                     boolean correct =  challenge.tryLetter(letter);
                     System.out.println(correct ? "Tentativa Correcta" : "Tentativa Incorecta" );
+                    System.out.println("Letras Tentadas: " + challenge.getTriedLettersString());
 
                     if (!correct){
-                        //drawHangMan(challenge.getCurrentErrors());
+                        drawHangMan(challenge.getCurrentErrors());
                     }
                 }
                 System.out.println(challenge.isWon() ? "\nPARABÉNS! Você adivinhou: " + challenge.getWord()
@@ -137,7 +136,7 @@ public class Game {
                 System.out.println("\nPressione Enter para continuar...");
                 br.readLine();
             }
-            currentPlayer.advanceToNextLevel();
+            checkLevelCompletion(currentLevel);
         }catch (IOException e){
             System.out.println(e.getMessage());
         }
@@ -162,6 +161,56 @@ public class Game {
             return letter;
         }
     }
+    void checkLevelCompletion(Level level){
+        System.out.println("=============Nivel Finalizado=============");
+        System.out.println(currentPlayer.getPlayerStatus());
+        System.out.println("Score do Nivel: " + currentPlayer.getCurrentLevelScore());
+        System.out.println("Desafios Concluidos: " + currentPlayer.getCompletedChallenges()  + " / "+
+                level.getChallenges().size());
+
+        boolean passed = level.canAdvanceToNextLevel(currentPlayer);
+        if (passed){
+            System.out.println("Parabéns! Você passou de nível!");
+            currentLevelIndex++;
+            currentPlayer.advanceToNextLevel();
+        }else {
+            if (isForgivingLevel(level)){
+                System.out.println("Você ainda não atingiu os requisitos mas este é um nível de aprendizado." +
+                        "\n Você pode continuar!");
+                System.out.println(printLevelRequeriments(level));
+                currentLevelIndex++;
+                currentPlayer.advanceToNextLevel();
+            }else {
+                System.out.println("Você não atingiu os requisitos para avançar.");
+                System.out.println(printLevelRequeriments(level));
+                System.out.println("Você precisará tentar novamente." +
+                        "\n Este nível exige domínio!!!!");
+                level.resetLevel();
+                playCurrentLevel();
+            }
+
+        }
+        System.out.println("=============================================");
+
+    }
+
+    boolean isForgivingLevel(Level level){
+        return level.getLevelNumber() >= 4;
+    }
+    void drawHangMan(int errors){
+        if (errors < 0 || errors > 6){
+            throw new IllegalArgumentException("Número de erros inválido: " + errors);
+        }
+        System.out.println(HangmanArt.STAGES[errors]);
+    }
+
+    String printLevelRequeriments(Level level){
+        return "Requisitos: " + "\n" +
+                "-- Score mínimo: " + level.getRequiredScoreToPass() + "\n" +
+                "--  Desafios mínimos: " + level.getRequiredChallengesToPass() + "\n";
+    }
+
+
     void exitGame(){
         System.out.println("Obriagdo por Jogar o Otaku HangMan, Sayonara minna-san!ᕦ(ò_óˇ)ᕤ");
         System.exit(0);
