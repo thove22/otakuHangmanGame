@@ -33,6 +33,10 @@ public class Challenge {
 
     public void setHint(String hint) {this.hint = hint;}
 
+    public Set<Character> getTriedLetters() {
+        return triedLetters;
+    }
+
     public String getCategory() {return category;}
 
     public void setCategory(String category) {this.category = category;}
@@ -72,7 +76,6 @@ public class Challenge {
         if (!found){
             currentErrors++;
         }
-
         return found;
     }
 
@@ -82,7 +85,7 @@ public class Challenge {
             return false;
         }
         }
-        return false;
+        return true;
     }
     boolean isLost(){
         return currentErrors >= MAX_ERRORS;
@@ -94,6 +97,7 @@ public class Challenge {
         return currentErrors;
     }
 
+
     void reset(){
         this.triedLetters.clear();
         this.currentErrors = 0;
@@ -101,6 +105,19 @@ public class Challenge {
         for (int i = 0 ; i < discoveredPositions.length; i++){
             discoveredPositions[i] = false;
         }
+    }
+    String getStatus(){
+        return  "Palavra: " + getMaskedWord() +
+                "\nLetras Tentadas: " + triedLetters +
+                "\nErros: " + currentErrors + " / " + MAX_ERRORS;
+    }
+    @Override
+    public String toString() {
+        return "Challenge{" +
+                "maskedWord='" + getMaskedWord() + '\'' +
+                ", triedLetters=" + triedLetters +
+                ", errors=" + currentErrors + "/" + MAX_ERRORS +
+                '}';
     }
 
 }

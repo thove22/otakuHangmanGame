@@ -7,15 +7,14 @@ public class Level {
    private List<Challenge> challenges;
    private int requiredScoreToPass;
    private int requiredChallengesToPass;
-   private int currentChallengesIndex;
-   private int completedChallenges;
-   private boolean isLevelCompleted;
-
    public Level(int levelNumber, List<Challenge> challenges){
+      if(challenges == null || challenges.isEmpty()){
+         throw new IllegalArgumentException("O level deve ter pelo menos um desafio");
+      }
       this.levelNumber = levelNumber;
       this.challenges = challenges;
-      this.currentChallengesIndex = 0;
-      this.completedChallenges = 0;
+      requiredChallengesToPass =  calculateMinScoreToPass() ;
+      requiredScoreToPass = calculateMinChallengesToPass()  ;
    }
 
    public int getLevelNumber() {
@@ -34,26 +33,7 @@ public class Level {
       return requiredChallengesToPass;
    }
 
-   public int getCurrentChallengesIndex() {
-      return currentChallengesIndex;
-   }
-
-   public int getCompletedChallenges() {
-      return completedChallenges;
-   }
-
-   public boolean isLevelCompleted() {
-      return isLevelCompleted;
-   }
-
-   void recordChallengeCompletion(){
-
-   }
    void resetLevel(){
-      currentChallengesIndex = 0;
-      completedChallenges = 0;
-      isLevelCompleted = false;
-
       for (Challenge challenge : challenges){
             challenge.reset();
       }
@@ -62,48 +42,33 @@ public class Level {
       return player.getCurrentLevelScore() >= requiredScoreToPass &&
               player.getCompletedChallenges() >= requiredChallengesToPass;
    }
-   Challenge getCurrentChallenge(){
-      if (currentChallengesIndex < 0 || currentChallengesIndex > challenges.size()){
-            return null;
-      }
-      return challenges.get(currentChallengesIndex);
-   }
 
-   boolean hasNextChallenges(){
-      return currentChallengesIndex < challenges.size() - 1;
-   }
-
-   void moveToNextChallenge(){
-         Challenge current = getCurrentChallenge();
-
-         if (current == null){
-            return;
-         }
-         if(!current.isComplete()){
-            return;
-         }
-         if (hasNextChallenges()){
-            currentChallengesIndex++;
-         }
-   }
-
-   double getProgressPercentage(){
-      return((double) completedChallenges/challenges.size()) * 100;
-   }
-
-   boolean isLevelComplete(){
-      return completedChallenges == challenges.size();
-   }
-   private int calcularMinimoDesafios() {
+   private int calculateMinChallengesToPass() {
       return (int) Math.ceil(challenges.size() * 0.75);
    }
 
-   private int calcularScoreMinimo() {
-      int maxScore = calcularScoreMaximo();
+   private int calculateMinScoreToPass() {
+      int maxScore = calculateMaxScore();
       return (int) (maxScore * 0.50);
    }
-   private int calcularScoreMaximo() {
-      int total = challenges.size();
-      return 370 + (total - 3) * 200;
+   private int calculateMaxScore() {
+      int totalChallenges = challenges.size();
+
+      if (totalChallenges <= 0) return  0;
+      int score = 0;
+      for(int i = 0; i < totalChallenges; i++){
+         int challengeNumber = i + 1;
+
+         if (challengeNumber == 1){
+            score+=100;
+         }else if(challengeNumber == 2){
+            score+=120;
+         } else if (challengeNumber == 3) {
+            score+=150;
+         }else{
+            score+=200;
+         }
+      }
+      return score;
    }
 }

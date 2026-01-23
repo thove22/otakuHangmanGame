@@ -65,6 +65,9 @@ public class Player {
         updateRank();
         return points;
     }
+    int processChallengesResult(int errors){
+        return processChallenge(errors);
+    }
      void updateRank(){
         Rank newRank = determineRankFromPoints(totalPoints);
 
@@ -89,6 +92,12 @@ public class Player {
         completedChallenges = 0;
     }
 
+    String getPlayerStatus(){
+
+        return "Score do nível: " + currentLevelScore +
+                "\nPontos totais: " + totalPoints +
+                "\nRank Actual: " + rank;
+    }
     void notifyRankup(Rank newRank){
         String message  = switch (newRank){
             case OTAKU_INICIANTE -> "Hajimemashite! Você é um Otaku Iniciante! (◕‿◕✿)";
