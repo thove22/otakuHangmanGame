@@ -7,7 +7,7 @@ public class Game {
     private List<Level> levels;
     private int currentLevelIndex;
     private boolean isPlaying;
-
+    private final BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
     public Player getCurrentPlayer() {return currentPlayer;}
     public void setCurrentPlayer(Player currentPlayer) {this.currentPlayer = currentPlayer;}
     public List<Level> getLevels() {return levels;}
@@ -23,7 +23,7 @@ public class Game {
     }
 
     private int displayMenu() {
-        try (BufferedReader br =  new BufferedReader(new InputStreamReader(System.in))){
+        try {
             int choice = 0;
             do{
                 System.out.println("≡≡≡ O T A K U - H A N G M A N ≡≡≡");
@@ -72,8 +72,6 @@ public class Game {
     }
     void startNewGame(){
         try {
-            BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-
             String name = getValidPlayerName(br);
             currentPlayer = new Player(name);
             levels = GameData.createLevels();
@@ -95,7 +93,7 @@ public class Game {
                 System.out.println(" O Nome deve ter entre 2 e 20 caracteres.");
                 continue;
             }
-            if (name.matches("^[a-zA-Z0-9_\\-\\s]+$")){
+            if (!name.matches("^[a-zA-Z0-9_\\-\\s]+$")){
                 System.out.println("Use apenas letras, números, espaços, hífen ou underscore");
                 continue;
             }
@@ -105,7 +103,6 @@ public class Game {
 
     void playCurrentLevel(){
         try {
-            BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
             currentPlayer.setCurrentLevelScore(0);
             Level currentLevel = levels.get(currentLevelIndex);
             List<Challenge> challenges = currentLevel.getChallenges();
@@ -121,13 +118,20 @@ public class Game {
                     boolean correct =  challenge.tryLetter(letter);
                     System.out.println(correct ? "Tentativa Correcta" : "Tentativa Incorecta" );
                     System.out.println("Letras Tentadas: " + challenge.getTriedLettersString());
-
+                    System.out.println("Tentativas: " + challenge.getAttemps() + " / " + challenge.getMaxAttemps());
                     if (!correct){
                         drawHangMan(challenge.getCurrentErrors());
                     }
                 }
-                System.out.println(challenge.isWon() ? "\nPARABÉNS! Você adivinhou: " + challenge.getWord()
-                        : "\n💀 FORCA COMPLETA! A palavra era: " + challenge.getWord());
+                if (challenge.isWon()){
+                    System.out.println("PARABÉNS! Você adivinhou: " + challenge.getWord());
+                }else {
+                    if (challenge.isMaxAttempsReached()){
+                        System.out.println("Numero de Tentativas Excedido! A palavra era: " + challenge.getWord());
+                    }else {
+                        System.out.println("💀FORCA COMPLETA! A palavra era: " + challenge.getWord());
+                    }
+                }
                 int errors = challenge.getCurrentErrors();
                 int pointEarned = currentPlayer.processChallengesResult(errors);
 

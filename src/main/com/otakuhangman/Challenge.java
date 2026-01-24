@@ -11,6 +11,8 @@ public class Challenge {
     private int currentErrors;
     private boolean[] discoveredPositions;
     private final int MAX_ERRORS = 6;
+    private int attemps;
+    private int maxAttemps;
     private String normalizedWord;
 
 
@@ -18,14 +20,23 @@ public class Challenge {
         this.word = word;
         this.category = category;
         this.hint = hint;
-
+        this.attemps = 0;
         this.normalizedWord = word.toUpperCase();
         this.discoveredPositions = new boolean[normalizedWord.length()];
         this.triedLetters = new HashSet<>();
         this.currentErrors = 0;
+        this.maxAttemps = normalizedWord.length() + 2;
     }
 
     public String getWord() {return word;}
+
+    public int getMaxAttemps() {
+        return maxAttemps;
+    }
+
+    public int getAttemps() {
+        return attemps;
+    }
 
     public void setWord(String word) {this.word = word;}
 
@@ -57,7 +68,7 @@ public class Challenge {
     }
 
     boolean tryLetter(char letter){
-
+        attemps++;
         char upperLetter = Character.toUpperCase(letter);
 
         if (triedLetters.contains(upperLetter)){
@@ -97,7 +108,11 @@ public class Challenge {
         return true;
     }
     boolean isLost(){
-        return currentErrors >= MAX_ERRORS;
+        return currentErrors >= MAX_ERRORS || attemps >= maxAttemps;
+    }
+
+    boolean isMaxAttempsReached(){
+        return attemps >= maxAttemps;
     }
     boolean isComplete(){
         return isWon() || isLost();
@@ -120,6 +135,7 @@ public class Challenge {
                 "Palavra: " + getMaskedWord() + "\n"+
                 "Letras Tentadas: " + triedLetters + "\n" +
                 "Erros: " + currentErrors + " / " + MAX_ERRORS + "\n"+
+                "Tentativas: " + attemps + " / " + maxAttemps + "\n"+
                 "=========================================";
     }
     @Override

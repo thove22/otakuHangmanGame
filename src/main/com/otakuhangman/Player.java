@@ -93,7 +93,6 @@ public class Player {
     }
 
     String getPlayerStatus(){
-
         return "Score do nível: " + currentLevelScore +
                 "\nPontos totais: " + totalPoints +
                 "\nRank Actual: " + rank;
