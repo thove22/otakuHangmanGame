@@ -1,5 +1,6 @@
 package main.com.otakuhangman;
 
+import javax.crypto.spec.PSource;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -14,13 +15,17 @@ public class Challenge {
     private int attemps;
     private int maxAttemps;
     private String normalizedWord;
+    private boolean ordered;
+    private int currentIndex;
 
 
-    public Challenge(String word, String hint, String category){
+    public Challenge(String word, String hint, String category, boolean ordered){
         this.word = word;
         this.category = category;
+        this.ordered = ordered;
         this.hint = hint;
         this.attemps = 0;
+        this.currentIndex = 0;
         this.normalizedWord = word.toUpperCase();
         this.discoveredPositions = new boolean[normalizedWord.length()];
         this.triedLetters = new HashSet<>();
@@ -52,6 +57,14 @@ public class Challenge {
 
     public void setCategory(String category) {this.category = category;}
 
+    public boolean isOrdered() {
+        return ordered;
+    }
+
+    public int getCurrentIndex() {
+        return currentIndex;
+    }
+
     String getMaskedWord(){
         char[] display = new char[normalizedWord.length()];
 
@@ -76,10 +89,19 @@ public class Challenge {
         }
 
         triedLetters.add(upperLetter);
+
+        if (!ordered){
+         return   tryNormalLetter(upperLetter);
+        }else {
+         return  tryOrderedLetter(upperLetter);
+        }
+
+    }
+    boolean tryNormalLetter(char letter){
         boolean found = false;
 
         for(int i = 0; i < normalizedWord.length(); i++){
-            if (normalizedWord.charAt(i) == upperLetter){
+            if (normalizedWord.charAt(i) == letter){
                 discoveredPositions[i] = true;
                 found = true;
             }
@@ -89,6 +111,27 @@ public class Challenge {
         }
         return found;
     }
+
+    boolean tryOrderedLetter(char letter){
+        if(currentIndex >= normalizedWord.length()){
+            return false;
+        }
+        char expected = normalizedWord.charAt(currentIndex);
+
+        if (letter == expected){
+            discoveredPositions[currentIndex] = true;
+            currentIndex++;
+            return true;
+        }else {
+            currentErrors++;
+            return false;
+        }
+    }
+     boolean isOrderMistake(char letter){
+            if (!ordered || currentIndex >= normalizedWord.length()) return  false;
+            return Character.toUpperCase(letter) != normalizedWord.charAt(currentIndex);
+     }
+
     String getTriedLettersString(){
         if(triedLetters.isEmpty()){
             return "Nenhuma letra tentada";
@@ -131,12 +174,14 @@ public class Challenge {
         }
     }
     String getStatus(){
-        return  "=========================================\n"+
+        return  "====================================================\n"+
+                (ordered ? "DESAFIO ORDENADO": " ") + "\n" +
                 "Palavra: " + getMaskedWord() + "\n"+
+                (ordered ? "Posição atual: " + currentIndex +  " / " + normalizedWord.length() + "\n" : " ") +
                 "Letras Tentadas: " + triedLetters + "\n" +
                 "Erros: " + currentErrors + " / " + MAX_ERRORS + "\n"+
                 "Tentativas: " + attemps + " / " + maxAttemps + "\n"+
-                "=========================================";
+                "=====================================================";
     }
     @Override
     public String toString() {

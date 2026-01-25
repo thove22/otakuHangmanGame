@@ -116,7 +116,19 @@ public class Game {
                 while (!challenge.isComplete()){
                     char letter = getTriedLetter(br);
                     boolean correct =  challenge.tryLetter(letter);
-                    System.out.println(correct ? "Tentativa Correcta" : "Tentativa Incorecta" );
+                    if(correct){
+                        System.out.println("Tentativa Correcta");
+                    }else{
+                        if (challenge.isOrdered()){
+                            if (challenge.isOrderMistake(letter)){
+                                System.out.println("Ordem Incorreta!");
+                            }else {
+                                System.out.println("Tentativa Incorecta");
+                            }
+                        }else {
+                            System.out.println("Tentativa Incorecta");
+                        }
+                    }
                     System.out.println("Letras Tentadas: " + challenge.getTriedLettersString());
                     System.out.println("Tentativas: " + challenge.getAttemps() + " / " + challenge.getMaxAttemps());
                     if (!correct){

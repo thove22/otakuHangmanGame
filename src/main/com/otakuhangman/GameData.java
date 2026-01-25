@@ -13,17 +13,17 @@ public final class GameData {
     }
     private static Level createLevel1(){
         List<Challenge> challenges = List.of(
-                new Challenge("NARUTO", "Ninja loiro de Konoha", "Anime"),
-                new Challenge("GOKU", "Saiyajin criado na Terra", "Anime"),
-                new Challenge("Luffy", "Capitão dos Chapéus de Palha", "Anime")
+                new Challenge("NARUTO", "Ninja loiro de Konoha", "Anime", true),
+                new Challenge("GOKU", "Saiyajin criado na Terra", "Anime", false),
+                new Challenge("Luffy", "Capitão dos Chapéus de Palha", "Anime", false)
         );
         return  new Level(1,challenges);
     }
     private static Level createLevel2(){
         List<Challenge> challenges = List.of(
-                new Challenge("DEATHNOTE", "Caderno mortal", "Anime"),
-                new Challenge("BLEACH", "Shinigamis e Hollows", "Anime"),
-                new Challenge("ATTACKONTITAN", "Titãs", "Anime")
+                new Challenge("DEATHNOTE", "Caderno mortal", "Anime", false),
+                new Challenge("BLEACH", "Shinigamis e Hollows", "Anime", false),
+                new Challenge("ATTACKONTITAN", "Titãs", "Anime", false)
         );
         return  new Level(2,challenges);
     }
