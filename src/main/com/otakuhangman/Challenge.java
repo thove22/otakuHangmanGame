@@ -66,18 +66,19 @@ public class Challenge {
     }
 
     String getMaskedWord(){
-        char[] display = new char[normalizedWord.length()];
+     StringBuilder sb = new StringBuilder();
 
         for (int i = 0; i < normalizedWord.length(); i++){
             char currentChar = normalizedWord.charAt(i);
 
             if (!Character.isLetter(currentChar) || discoveredPositions[i]){
-                display[i] = currentChar;
+                sb.append(currentChar);
             }else {
-                display[i] ='_';
+                sb.append("_");
             }
+            sb.append(" ");
         }
-        return new String(display);
+        return sb.toString().trim();
     }
 
     boolean tryLetter(char letter){
