@@ -107,37 +107,50 @@ public class Game {
             Level currentLevel = levels.get(currentLevelIndex);
             List<Challenge> challenges = currentLevel.getChallenges();
             int totalChallenges = challenges.size();
+
             for (int i = 0 ; i < totalChallenges ; i++){
                 Challenge challenge = challenges.get(i);
                 System.out.println("Desafio " + (i + 1) + " de " + totalChallenges);
                 System.out.println(challenge.getHint());
-                System.out.println(challenge.getStatus());
 
                 while (!challenge.isComplete()){
+                    System.out.println(challenge.getStatus());
                     char letter = getTriedLetter(br);
-                    boolean correct =  challenge.tryLetter(letter);
-                    if(correct){
-                        System.out.println("Tentativa Correcta");
-                    }else{
-                        System.out.println(challenge.isOrdered() ? "Ordem Incorreta!" :
-                                "Tentativa Incorreta");
-                        drawHangMan(challenge.getCurrentErrors());
+                    AttemptResult result = challenge.tryLetter(letter);
+
+                    switch (result){
+                        case CORRECT -> {
+                            System.out.println("Tentativa Correta!");
+                        }
+                        case WRONG -> {
+                            System.out.println("Tentativa Incorreta!");
+                            drawHangMan(challenge.getCurrentErrors());
+                        }
+                        case ORDER_MISTAKE -> {
+                            System.out.println("Ordem Incorreta!");
+                            drawHangMan(challenge.getCurrentErrors());
+                        }
+                        case REPEATED -> {
+                            System.out.println("Letra já Tentada!");
+                        }
+                        case TIME_UP -> {
+                            System.out.println("Tempo Esgotado!");
+                        }
                     }
-                    if (challenge.isTimeUp()){
-                        System.out.println("Tempo Esgotado!");
-                    }
+
                     System.out.println("Letras Tentadas: " + challenge.getTriedLettersString());
                     System.out.println("Tentativas: " + challenge.getAttemps() + " / " + challenge.getMaxAttemps());
                     if (challenge.isLost()){
                         break;
                     }
                 }
-
                 if (challenge.isWon()){
                     System.out.println("PARABÉNS! Você adivinhou: " + challenge.getWord());
                 }else {
                     if (challenge.isMaxAttempsReached()){
                         System.out.println("Numero de Tentativas Excedido! A palavra era: " + challenge.getWord());
+                    }else if(challenge.isTimeUp()) {
+                        System.out.println("Tempo Esgotado! A palavra era: " + challenge.getWord());
                     }else {
                         System.out.println("💀FORCA COMPLETA! A palavra era: " + challenge.getWord());
                     }

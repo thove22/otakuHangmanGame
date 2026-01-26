@@ -85,12 +85,16 @@ public class Challenge {
         return sb.toString().trim();
     }
 
-    boolean tryLetter(char letter){
+    AttemptResult tryLetter(char letter){
+        if (isTimeUp()){
+            return AttemptResult.TIME_UP;
+        }
         attemps++;
+
         char upperLetter = Character.toUpperCase(letter);
 
         if (triedLetters.contains(upperLetter)){
-            return false;
+            return AttemptResult.REPEATED;
         }
 
         triedLetters.add(upperLetter);
@@ -102,7 +106,8 @@ public class Challenge {
         }
 
     }
-    boolean tryNormalLetter(char letter){
+
+    AttemptResult tryNormalLetter(char letter){
         boolean found = false;
 
         for(int i = 0; i < normalizedWord.length(); i++){
@@ -113,23 +118,24 @@ public class Challenge {
         }
         if (!found){
             currentErrors++;
+            return AttemptResult.WRONG;
         }
-        return found;
+        return AttemptResult.CORRECT;
     }
 
-    boolean tryOrderedLetter(char letter){
+    AttemptResult tryOrderedLetter(char letter){
         if(currentIndex >= normalizedWord.length()){
-            return false;
+            return AttemptResult.WRONG;
         }
         char expected = normalizedWord.charAt(currentIndex);
 
         if (letter == expected){
             discoveredPositions[currentIndex] = true;
             currentIndex++;
-            return true;
+            return AttemptResult.CORRECT;
         }else {
             currentErrors++;
-            return false;
+            return AttemptResult.ORDER_MISTAKE;
         }
     }
      boolean isOrderMistake(char letter){
@@ -177,7 +183,6 @@ public class Challenge {
     public int getCurrentErrors(){
         return currentErrors;
     }
-
 
     void reset(){
         this.triedLetters.clear();
