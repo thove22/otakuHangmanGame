@@ -110,14 +110,16 @@ public class Game {
 
             for (int i = 0 ; i < totalChallenges ; i++){
                 Challenge challenge = challenges.get(i);
+                challenge.startTimer();
+                challenge.reset();
                 System.out.println("Desafio " + (i + 1) + " de " + totalChallenges);
                 System.out.println(challenge.getHint());
 
                 while (!challenge.isComplete()){
+
                     System.out.println(challenge.getStatus());
                     char letter = getTriedLetter(br);
                     AttemptResult result = challenge.tryLetter(letter);
-
                     switch (result){
                         case CORRECT -> {
                             System.out.println("Tentativa Correta!");

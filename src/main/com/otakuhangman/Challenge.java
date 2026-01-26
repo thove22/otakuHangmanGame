@@ -33,7 +33,6 @@ public class Challenge {
         this.triedLetters = new HashSet<>();
         this.currentErrors = 0;
         this.maxAttemps = normalizedWord.length() + 2;
-        this.startTimeNs = System.nanoTime();
         this.timeLimitNs = 30L * 1_000_000_000L;
     }
 
@@ -138,10 +137,6 @@ public class Challenge {
             return AttemptResult.ORDER_MISTAKE;
         }
     }
-     boolean isOrderMistake(char letter){
-            if (!ordered || currentIndex >= normalizedWord.length()) return  false;
-            return Character.toUpperCase(letter) != normalizedWord.charAt(currentIndex);
-     }
 
      boolean isTimeUp(){
         return (System.nanoTime() - startTimeNs) >= timeLimitNs;
@@ -150,6 +145,9 @@ public class Challenge {
      long remaingSeconds(){
         long remaingNs = timeLimitNs - (System.nanoTime() - startTimeNs);
         return Math.max(0, remaingNs / 1_000_000_000L);
+     }
+     void startTimer(){
+         this.startTimeNs = System.nanoTime();
      }
 
     String getTriedLettersString(){
