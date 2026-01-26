@@ -17,6 +17,8 @@ public class Challenge {
     private String normalizedWord;
     private boolean ordered;
     private int currentIndex;
+    private long startTimeNs;
+    private long timeLimitNs;
 
 
     public Challenge(String word, String hint, String category, boolean ordered){
@@ -31,6 +33,8 @@ public class Challenge {
         this.triedLetters = new HashSet<>();
         this.currentErrors = 0;
         this.maxAttemps = normalizedWord.length() + 2;
+        this.startTimeNs = System.nanoTime();
+        this.timeLimitNs = 30L * 1_000_000_000L;
     }
 
     public String getWord() {return word;}
@@ -133,6 +137,15 @@ public class Challenge {
             return Character.toUpperCase(letter) != normalizedWord.charAt(currentIndex);
      }
 
+     boolean isTimeUp(){
+        return (System.nanoTime() - startTimeNs) >= timeLimitNs;
+     }
+
+     long remaingSeconds(){
+        long remaingNs = timeLimitNs - (System.nanoTime() - startTimeNs);
+        return Math.max(0, remaingNs / 1_000_000_000L);
+     }
+
     String getTriedLettersString(){
         if(triedLetters.isEmpty()){
             return "Nenhuma letra tentada";
@@ -152,7 +165,7 @@ public class Challenge {
         return true;
     }
     boolean isLost(){
-        return currentErrors >= MAX_ERRORS || attemps >= maxAttemps;
+        return currentErrors >= MAX_ERRORS || attemps >= maxAttemps || isTimeUp();
     }
 
     boolean isMaxAttempsReached(){
@@ -169,7 +182,9 @@ public class Challenge {
     void reset(){
         this.triedLetters.clear();
         this.currentErrors = 0;
-
+        this.attemps = 0;
+        this.currentIndex = 0;
+        this.startTimeNs = System.nanoTime();
         for (int i = 0 ; i < discoveredPositions.length; i++){
             discoveredPositions[i] = false;
         }
@@ -182,6 +197,7 @@ public class Challenge {
                 "Letras Tentadas: " + triedLetters + "\n" +
                 "Erros: " + currentErrors + " / " + MAX_ERRORS + "\n"+
                 "Tentativas: " + attemps + " / " + maxAttemps + "\n"+
+                "Tempo Restante: " + remaingSeconds() + "s " + "\n" +
                 "=====================================================";
     }
     @Override

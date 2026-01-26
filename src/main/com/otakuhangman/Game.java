@@ -119,22 +119,20 @@ public class Game {
                     if(correct){
                         System.out.println("Tentativa Correcta");
                     }else{
-                        if (challenge.isOrdered()){
-                            if (challenge.isOrderMistake(letter)){
-                                System.out.println("Ordem Incorreta!");
-                            }else {
-                                System.out.println("Tentativa Incorecta");
-                            }
-                        }else {
-                            System.out.println("Tentativa Incorecta");
-                        }
+                        System.out.println(challenge.isOrdered() ? "Ordem Incorreta!" :
+                                "Tentativa Incorreta");
+                        drawHangMan(challenge.getCurrentErrors());
+                    }
+                    if (challenge.isTimeUp()){
+                        System.out.println("Tempo Esgotado!");
                     }
                     System.out.println("Letras Tentadas: " + challenge.getTriedLettersString());
                     System.out.println("Tentativas: " + challenge.getAttemps() + " / " + challenge.getMaxAttemps());
-                    if (!correct){
-                        drawHangMan(challenge.getCurrentErrors());
+                    if (challenge.isLost()){
+                        break;
                     }
                 }
+
                 if (challenge.isWon()){
                     System.out.println("PARABÉNS! Você adivinhou: " + challenge.getWord());
                 }else {
