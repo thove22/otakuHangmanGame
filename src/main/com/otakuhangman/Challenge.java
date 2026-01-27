@@ -19,6 +19,7 @@ public class Challenge {
     private int currentIndex;
     private long startTimeNs;
     private long timeLimitNs;
+    private EndChallengeReason endReason;
 
 
     public Challenge(String word, String hint, String category, boolean ordered){
@@ -166,10 +167,22 @@ public class Challenge {
             return false;
         }
         }
+        endReason = EndChallengeReason.WON;
         return true;
     }
     boolean isLost(){
-        return currentErrors >= MAX_ERRORS || attemps >= maxAttemps || isTimeUp();
+        if (isTimeUp()){
+            endReason = EndChallengeReason.TIME_UP;
+            return true;
+        }
+        if (currentErrors >= MAX_ERRORS){
+            endReason = EndChallengeReason.ERROR_LIMIT;
+            return true;
+        }
+        if (attemps >= maxAttemps){
+            endReason = EndChallengeReason.ATTEMPS_LIMIT;
+        }
+        return false;
     }
 
     boolean isMaxAttempsReached(){
