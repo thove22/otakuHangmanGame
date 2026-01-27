@@ -145,7 +145,6 @@ public class Game {
                         }
                     }
 
-
                     System.out.println("Letras Tentadas: " + challenge.getTriedLettersString());
                     System.out.println("Tentativas: " + challenge.getAttemps() + " / " + challenge.getMaxAttemps());
                     if (challenge.isLost()){
@@ -163,8 +162,14 @@ public class Game {
                         System.out.println("💀FORCA COMPLETA! A palavra era: " + challenge.getWord());
                     }
                 }
-                int errors = challenge.getCurrentErrors();
-                int pointEarned = currentPlayer.processChallengesResult(errors);
+                EndChallengeReason endReason = challenge.getEndReason();
+
+                int pointEarned = switch (endReason){
+                    case WON -> currentPlayer.processChallengesResult(challenge.getCurrentErrors());
+                    case TIME_UP -> currentPlayer.processChallengesResult(6);
+                    case ERROR_LIMIT -> currentPlayer.processChallengesResult(6);
+                    case ATTEMPS_LIMIT -> currentPlayer.processChallengesResult(6);
+                };
 
                 System.out.println(currentPlayer.getPlayerStatus());
                 System.out.println("\n Resultados do Jogador: ");

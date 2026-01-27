@@ -47,26 +47,14 @@ public class Challenge {
         return attemps;
     }
 
-    public void setWord(String word) {this.word = word;}
-
     public String getHint() {return hint;}
-
-    public void setHint(String hint) {this.hint = hint;}
 
     public Set<Character> getTriedLetters() {
         return triedLetters;
     }
 
-    public String getCategory() {return category;}
-
-    public void setCategory(String category) {this.category = category;}
-
-    public boolean isOrdered() {
-        return ordered;
-    }
-
-    public int getCurrentIndex() {
-        return currentIndex;
+    public EndChallengeReason getEndReason() {
+        return endReason;
     }
 
     String getMaskedWord(){
