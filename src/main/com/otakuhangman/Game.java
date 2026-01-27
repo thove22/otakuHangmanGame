@@ -116,6 +116,11 @@ public class Game {
                 System.out.println(challenge.getHint());
 
                 while (!challenge.isComplete()){
+                    if (challenge.isTimeUp()){
+                        currentPlayer.processChallengesResult(6);
+                        drawHangMan(6);
+                        break;
+                    }
 
                     System.out.println(challenge.getStatus());
                     char letter = getTriedLetter(br);
@@ -139,6 +144,7 @@ public class Game {
                             System.out.println("Tempo Esgotado!");
                         }
                     }
+
 
                     System.out.println("Letras Tentadas: " + challenge.getTriedLettersString());
                     System.out.println("Tentativas: " + challenge.getAttemps() + " / " + challenge.getMaxAttemps());
