@@ -6,16 +6,7 @@ public class Game {
     private Player currentPlayer;
     private List<Level> levels;
     private int currentLevelIndex;
-    private boolean isPlaying;
     private final BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-    public Player getCurrentPlayer() {return currentPlayer;}
-    public void setCurrentPlayer(Player currentPlayer) {this.currentPlayer = currentPlayer;}
-    public List<Level> getLevels() {return levels;}
-    public void setLevels(List<Level> levels) {this.levels = levels;}
-    public int getCurrentLevelIndex() {return currentLevelIndex;}
-    public void setCurrentLevelIndex(int currentLevelIndex) {this.currentLevelIndex = currentLevelIndex;}
-    public boolean isPlaying() {return isPlaying;}
-    public void setPlaying(boolean playing) {isPlaying = playing;}
 
     public  void start(){
         int userChoice  = displayMenu();
