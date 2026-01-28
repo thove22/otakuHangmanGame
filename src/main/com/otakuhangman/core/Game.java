@@ -1,4 +1,6 @@
-package main.com.otakuhangman;
+package main.com.otakuhangman.core;
+import main.com.otakuhangman.core.AttemptResult;
+
 import java.io.*;
 import java.util.List;
 

@@ -1,4 +1,4 @@
-package main.com.otakuhangman;
+package main.com.otakuhangman.core;
 
 public class ScoreCalculator {
 

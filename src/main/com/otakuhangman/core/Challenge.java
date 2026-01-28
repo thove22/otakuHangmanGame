@@ -1,6 +1,7 @@
-package main.com.otakuhangman;
+package main.com.otakuhangman.core;
 
-import javax.crypto.spec.PSource;
+import main.com.otakuhangman.core.AttemptResult;
+
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -73,7 +74,7 @@ public class Challenge {
         return sb.toString().trim();
     }
 
-    AttemptResult tryLetter(char letter){
+  public AttemptResult tryLetter(char letter){
         if (isTimeUp()){
             return AttemptResult.TIME_UP;
         }

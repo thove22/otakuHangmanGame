@@ -1,4 +1,4 @@
-package main.com.otakuhangman;
+package main.com.otakuhangman.core;
 
 public enum ScoreBase {
    NO_ERROR(0, 100),
