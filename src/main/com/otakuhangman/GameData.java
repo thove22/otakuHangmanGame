@@ -87,18 +87,25 @@ public final class GameData {
     private static Level createLevel6(){
         List<Challenge> challenges = List.of(
                 new Challenge("HIMMEL", "O herói que morreu no ep 1 mas deixou uma estátua em cada esquina", "Seinen", false),
-                new Challenge("BLEACH", "Shinigamis e Hollows", "Anime", false),
-                new Challenge("ATTACKONTITAN", "Titãs", "Anime", false)
+                new Challenge("AQUA", "A deusa inútil que serve como purificador de água e geradora de dívidas", "Isekai", false),
+                new Challenge("HITOGAMI", "A divindade que te dá dicas num vazio branco e sorri como um político", "Isekai", false),
+                new Challenge("KENZOTENMA", "O neurocirurgião que aprendeu que nem toda vida merece ser salva", "Seinen", false),
+                new Challenge("DEBRIS", "O lixo espacial que os garis do futuro precisam recolher pra evitar desastres orbitais", "Sci-Fi", false),
+                new Challenge("CAPSULECORP", "Empresa onde literalmente tudo cabe no bolso", "Shonen", false),
+                new Challenge("RYUZAKI", "Pseudônimo do detetive viciado em açúcar", "Seinen", false)
 
         );
         return  new Level(6,challenges);
     }
     private static Level createLevel7(){
         List<Challenge> challenges = List.of(
-                new Challenge("DEATHNOTE", "Caderno mortal", "Anime", false),
-                new Challenge("BLEACH", "Shinigamis e Hollows", "Anime", false),
-                new Challenge("ATTACKONTITAN", "Titãs", "Anime", false)
-
+                new Challenge("ONIZUKA", "Professor, 22 anos, virgem, faixa preta e fã de dar suplex em diretor", "Classic", false),
+                new Challenge("SPEEDWAGON", "A verdadeira 'best waifu' que narra a luta e financia a porradaria geracional", "Seinen", false),
+                new Challenge("LAIN", "A garota que confunde cabo de internet com cordão umbilical existencial", "Sci-Fi", false),
+                new Challenge("BOOGIEPOP", "A shinigami que surge quando o mundo está desequilibrado e só aparece na timeline certa", "Sci-Fi", false),
+                new Challenge("HAIBANE", "Anjos cinzentos que brotam de casulos e pagam pecados esquecidos em paredes velhas", "Fantasy", false),
+                new Challenge("GINTOKI", "Samurai que troca a espada por madeira e faz bico pra pagar aluguel", "Sci-Fi", false),
+                new Challenge("KAGUYASAMA", "A deusa da lua que decide brincar de 'quem se declara primeiro' num colégio de elite", "Romance", false)
         );
         return  new Level(7,challenges);
     }
