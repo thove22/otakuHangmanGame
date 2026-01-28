@@ -111,10 +111,13 @@ public final class GameData {
     }
     private static Level createLevel8(){
         List<Challenge> challenges = List.of(
-                new Challenge("DEATHNOTE", "Caderno mortal", "Anime", false),
-                new Challenge("BLEACH", "Shinigamis e Hollows", "Anime", false),
-                new Challenge("ATTACKONTITAN", "Titãs", "Anime", false)
-
+                new Challenge("BONDREWD", "O 'Melhor Pai do Ano' que transforma crianças em lancheiras de bateria", "Dark Fantasy", false),
+                new Challenge("GRIFFITH", "Líder carismático que troca amigos por upgrade demoníaco e castelo, fanbase ainda defende 'ele só queria voar", "Seinen", false),
+                new Challenge("WIRED", "ede cibernética vintage onde egos se dissolvem em delírios coletivos e todo mundo vira deus online sem logout", "Sci-Fi", false),
+                new Challenge("MAKISHIMA", "O filósofo criminoso que hackeia mentes pra provar que livre arbítrio não existe", "SCI-FI", false),
+                new Challenge("LELOUCH", "O príncipe exilado que virou terrorista com olho hipnótico pra salvar a irmã", "Mecha", false),
+                new Challenge("MERUEM", "Rei formiga overpowered que vira filósofo softie jogando Gungi com cega e descobrindo feels humanos inesperados", "Shonen", false),
+                new Challenge("HORIMIYA", "A popular escondendo que é doméstica e o emo escondendo piercing e tattoo", "Romance", false)
         );
         return  new Level(8,challenges);
     }
