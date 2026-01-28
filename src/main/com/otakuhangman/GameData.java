@@ -57,22 +57,36 @@ public final class GameData {
     }
     private static Level createLevel4(){
         List<Challenge> challenges = List.of(
-
+                new Challenge("ALABASTA", "Reino arenoso do crocodilo traidor", "Shonen", false),
+                new Challenge("MIGI", "O melhor amigo que nasceu na sua mão direita e quer te estudar", "Seinen", false),
+                new Challenge("KNIGHTMAREFRAME", "robôs que dão drift e andam de patins no campo de batalha", "Mecha", false),
+                new Challenge("BEHELIT", "Ovo facial que ativa o modo eclipse e vira banquete demoníaco", "Seinen", false),
+                new Challenge("TRUCKKUN", "O maior serial killer de protagonistas da história dos isekai", "Isekai", false),
+                new Challenge("ZETTAIRYOUIKI", "A distância sagrada e absoluta entre a meia alta e a saia", "Anime Trope", false),
+                new Challenge("THETRUTH", "Entidade branca que rouba seu corpo por equivalência", "Shounen", false)
         );
         return  new Level(4,challenges);
     }
     private static Level createLevel5(){
         List<Challenge> challenges = List.of(
-                new Challenge("DEATHNOTE", "Caderno mortal", "Anime", false),
-                new Challenge("BLEACH", "Shinigamis e Hollows", "Anime", false),
-                new Challenge("ATTACKONTITAN", "Titãs", "Anime", false)
-
+                new Challenge("ZOLTRAAK", "A magia de ataque 'comum' que era o terror dos demônios há 80 anos", "ISekai", false),
+                new Challenge("SKYPEIA", "Ilha nas nuvens onde Deus toca tambor elétrico", "Shonen", false),
+                new Challenge("MEGUMIN", "Archmage que só sabe um feitiço e desmaia depois",
+                        "Isekai", false),
+                new Challenge("MALEVOLENTKITCHEN", "A expansão de domínio do cozinheiro que fatia geral no centro de Shibuya",
+                        "Shonen", false),
+                new Challenge("AINZ", "O esqueleto que finge ter um plano genial enquanto morre de ansiedade por dentro",
+                        "Isekai", false),
+                new Challenge("VINLAND", "Terra prometida sem brigas sonho do ex-anão viking raivoso que virou o maior filósofo paz e amor das fazendas",
+                        "Seinen", false),
+                new Challenge("REIGEN", "Mestre fake que 'exorciza' com sal e papo furado, mas salva o dia com vibe de chefe preguiçoso",
+                        "Shonen", false)
         );
         return  new Level(5,challenges);
     }
     private static Level createLevel6(){
         List<Challenge> challenges = List.of(
-                new Challenge("DEATHNOTE", "Caderno mortal", "Anime", false),
+                new Challenge("HIMMEL", "O herói que morreu no ep 1 mas deixou uma estátua em cada esquina", "Seinen", false),
                 new Challenge("BLEACH", "Shinigamis e Hollows", "Anime", false),
                 new Challenge("ATTACKONTITAN", "Titãs", "Anime", false)
 
