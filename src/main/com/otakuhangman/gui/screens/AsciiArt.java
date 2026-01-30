@@ -15,28 +15,29 @@ public final class AsciiArt {
     }
     public static String paint(){
         return """
-                .   .       .           .        .         .           .           .     .    *                                   
-                  .      .      .          .           .     .         .        .       .                                                                                         
-                  .      .      *           .       .          .                       .                                       
-                                 .       .   . *       * *       .       .      .                                        
-                  .       ____     .      . .     .     .     *        *    .        *                                  
-                         <WW>>>         .        .      .    .       .       .          . .  
-                 .   .  /WWWI; \\  .       .    .  ____               .            ."   .
-                  *    /WWWWII; \\=====;    .     /WI; \\   *    .        /\\_             .
-                  .   /WWWWWII;..      \\_  . ___/WI;:. \\     .        _/M; \\    .   .         .
-                     /WWWWWIIIIi;..      \\__/WWWIIII:.. \\____ .   .  /MMI:  \\   * .
-                 . _/WWWWWIIIi;;;:...:   ;\\WWWWWWIIIII;.     \\     /MMWII;   \\    .  .     .
-                  /WWWWWIWIiii;;;.:.. :   ;\\WWWWWIII;;;::     \\___/MMWIIII;   \\              .
-                 /WWWWWIIIIiii;;::.... :   ;|WWWWWWII;;::.:      :;IMWIIIII;:   \\___     *
-                /WWWWWWWWWIIIIIWIIii;;::;..;\\WWWWWWIII;;;:::...    ;IMIII;;     ::  \\     .
-                WWWWWWWWWIIIIIIIIIii;;::.;..;\\WWWWWWWWIIIII;;..  :;IMIII;:::     :    \\
-                WWWWWWWWWWWWWIIIIIIii;;::..;..;\\WWWWWWWWIIII;::; :::::::::.....::       \\
-                %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX%%%%%%%
-                %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX%%%%%%%%%
-                %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX%%%%%%%%%%%%
-                %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX%%%%%%%%%%%%%%%
+                .   .       .           .        .         .           .           .     .    *      .      *       *   .     \\'/                    
+                  .      .      .          .           .     .         .        .       .          ___     *   *     .   .  -= * =-                                                             
+                  .      .      *           .       .          .                       .     ~*  .'`  _\\     .    *  .        /.\\            
+                                 .       .   . *       * *       .       .      .               /  (o/   *     .    . .     .   *   .            
+                  .       ____     .      . .     .     .     *        *    .        *    *    |     _\\     *  *  .    *     *     .           
+                         <WW>>>         .        .      .    .       .       .          . .     \\  '==. * *    .      .   *     (  .             
+                 .   .  /WWWI; \\  .       .    .  ____               .            ."   .   *     '.____\\   ~*   .    .  *    *    .
+                  *    /WWWWII; \\=====;    .     /WI; \\   *    .        /\\_             .     .     *       *      *   *   )     .
+                  .   /WWWWWII;..      \\_  . ___/WI;:. \\     .        _/M; \\    .   .         .      .         .    .   .     .  .
+                     /WWWWWIIIIi;..      \\__/WWWIIII:.. \\____ .   .  /MMI:  \\   * .        .          .      *  .  .  .     *     .              
+                 . _/WWWWWIIIi;;;:...:   ;\\WWWWWWIIIII;.     \\     /MMWII;   \\    .  .     .                /.\\
+                  /WWWWWIWIiii;;;.:.. :   ;\\WWWWWIII;;;::     \\___/MMWIIII;   \\              .             /'.'\\    .    .     .   . 
+                 /WWWWWIIIIiii;;::.... :   ;|WWWWWWII;;::.:      :;IMWIIIII;:   \\___     *                /.''.'\\         .   .     .
+                /WWWWWWWWWIIIIIWIIii;;::;..;\\WWWWWWIII;;;:::...    ;IMIII;;     ::  \\     .              /.'.'  .\\  .       .   .    
+                WWWWWWWWWIIIIIIIIIii;;::.;..;\\WWWWWWWWIIIII;;..  :;IMIII;:::     :    \\           "'""\""/'.''.'  .\\""'"'"     . 
+                WWWWWWWWWWWWWIIIIIIii;;::..;..;\\WWWWWWWWIIII;::; :::::::::.....::       \\            thx ^^^[_]^^^ .      .    .   . 
+                %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX%%%%%%%%%%%%%%
+                %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX%%%%%%%%%%%%%%%%
+                %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX%%%%%%%%%%%%%%%%%%%
+                %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX%%%%%%%%%%%%%%%%%%%%%%
                 """;
     }
+
 
 
     public static String drawBoxAscii(String content){
