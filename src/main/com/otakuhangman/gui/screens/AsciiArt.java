@@ -39,7 +39,23 @@ public final class AsciiArt {
     }
 
 
+    public static String drawBoxAscii(String content){
+        String[] lines = content.split("\n");
+        int maxLen = 0;
 
+        for (String line : lines) {
+            maxLen = Math.max(maxLen, line.length());
+        }
+        StringBuilder sb = new StringBuilder();
+        String edge = "+" + "-".repeat(maxLen + 4) + "+";
+        sb.append(edge).append("\n");
+        for (String line : lines){
+            int padding = maxLen - line.length();
+            sb.append("|  ").append(line).append(" ".repeat(padding)).append("  |\n");
+        }
+        sb.append(edge);
+        return sb.toString();
+    }
 
 
 }
