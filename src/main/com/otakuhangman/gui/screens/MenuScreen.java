@@ -1,5 +1,6 @@
 package main.com.otakuhangman.gui.screens;
 import main.com.otakuhangman.gui.Screen;
+import main.com.otakuhangman.gui.utils.AsciiArt;
 import main.com.otakuhangman.gui.utils.Star;
 import javax.swing.*;
 import java.awt.*;
@@ -18,12 +19,24 @@ public class MenuScreen extends Screen {
     public MenuScreen() {
         setLayout(new GridBagLayout());
         setBackground(Color.BLACK);
+        GridBagConstraints gbc = new GridBagConstraints();
 
         starField = new ArrayList<>();
         for (int i = 0; i < STAR_COUNT; i++) {
             starField.add(new Star(1200, 800));
         }
-
+        JTextArea titleArea = new JTextArea(AsciiArt.MENUTITLE());
+        titleArea.setFont(new Font("Monospaced", Font.BOLD, 16));
+        titleArea.setForeground(DEFAULT_COLOR);
+        titleArea.setOpaque(false);
+        titleArea.setEditable(false);
+        titleArea.setFocusable(false);
+        titleArea.setAlignmentX(Component.CENTER_ALIGNMENT);
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.insets = new Insets(20, 0, 50, 0);
+        gbc.anchor = GridBagConstraints.CENTER;
+        add(titleArea, gbc);
         JPanel menuPanel = new JPanel();
         menuPanel.setLayout(new BoxLayout(menuPanel, BoxLayout.Y_AXIS));
         menuPanel.setOpaque(false);
@@ -34,7 +47,9 @@ public class MenuScreen extends Screen {
         menuPanel.add(createMenuItem("INSTRUCTIONS", 3));
         menuPanel.add(Box.createRigidArea(new Dimension(0, 20)));
         menuPanel.add(createMenuItem("QUIT", 4));
-        add(menuPanel, new GridBagConstraints());
+        gbc.gridy = 1;
+        gbc.insets = new Insets(0, 0, 0, 0);
+        add(menuPanel, gbc);
         animationTimer = new Timer(16, e -> {
             for (Star star : starField) {
                 star.update(getWidth(), getHeight());
@@ -44,7 +59,7 @@ public class MenuScreen extends Screen {
     }
     private JLabel createMenuItem(String text, int choice){
         JLabel item = new JLabel(text);
-        item.setFont(new Font("Monospaced", Font.BOLD, 40));
+        item.setFont(new Font("Monospaced", Font.BOLD, 32));
         item.setForeground(DEFAULT_COLOR);
         item.setAlignmentX(Component.CENTER_ALIGNMENT);
         item.setCursor(new Cursor(Cursor.HAND_CURSOR));
