@@ -69,5 +69,21 @@ public final class AsciiArt {
                 
                 """;
     }
+    public static String ONBOARDING_TEXT(){
+        return """
+                                 ═══════════════════════════════════════════════════════════════════════════════
+                
+                                          ░▒▓█►  Nas sombras da ignorância, apenas o conhecimento  ◄█▓▒░
+                                          ░▒▓█►    pode te salvar da forca da eternidade...       ◄█▓▒░
+                                          ░▒▓█►                                                   ◄█▓▒░
+                                          ░▒▓█►      Você ousa desafiar o destino, viajante?      ◄█▓▒░
+                
+                                ═══════════════════════════════════════════════════════════════════════════════
+                
+                                                    [ Pressione qualquer tecla para começar ]
+                
+                                ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+                """;
+    }
 
 }
