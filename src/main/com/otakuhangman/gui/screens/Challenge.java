@@ -54,7 +54,7 @@ public class Challenge extends Screen {
         gbc.gridy = 1; gbc.weighty = 1.0; gbc.fill = GridBagConstraints.BOTH;
         contentPanel.add(zoneB, gbc);
 
-        gallowsArea = new JTextArea(AsciiArt.getGallows(0)); // Start empty
+        gallowsArea = new JTextArea(HangmanArt.STAGES[0]);
         gallowsArea.setEditable(false);
         gallowsArea.setFocusable(false);
         gallowsArea.setBackground(Color.BLACK);
@@ -62,8 +62,7 @@ public class Challenge extends Screen {
         gallowsArea.setFont(new Font("Monospaced", Font.PLAIN, 14));
         GridBagConstraints gbcB = new GridBagConstraints();
         gbcB.gridx = 0; gbcB.gridy = 0; gbcB.anchor = GridBagConstraints.CENTER;
-        gbcB.insets = new Insets(0, 0, 0, 40); // Spacing between gallows and word
-        zoneB.add(gallowsArea, gbcB);
+        gbcB.insets = new Insets(0, 0, 0, 40);
 
         JPanel rightPanel = new JPanel(new GridBagLayout());
         rightPanel.setOpaque(false);
@@ -133,7 +132,8 @@ public class Challenge extends Screen {
         hudLabel.setForeground(time <= 10 ? Color.RED : Color.WHITE);
     }
     public void updateGallows(int errors) {
-        gallowsArea.setText(AsciiArt.getGallows(errors));
+        int stageIndex = Math.min(errors, HangmanArt.STAGES.length - 1);
+        gallowsArea.setText(HangmanArt.STAGES[stageIndex]);
     }
 
     public void updateWordStatus(String status) {
@@ -165,7 +165,7 @@ public class Challenge extends Screen {
 
     @Override
     public void onExit() {
-
+       
     }
 
 }
