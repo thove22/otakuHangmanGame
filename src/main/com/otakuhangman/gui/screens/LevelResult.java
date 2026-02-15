@@ -7,6 +7,8 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.util.Random;
 import main.com.otakuhangman.gui.Screen;
+import main.com.otakuhangman.gui.utils.AsciiArt;
+
 
 public class LevelResult extends Screen {
     // --- Colors ---
@@ -38,31 +40,6 @@ public class LevelResult extends Screen {
     private Font fontTitle;
     private Font fontStats;
 
-    // --- ASCII Arts ---
-    private final String[] winAscii = {
-            "      \\O/      ",
-            "       |       ",
-            "      / \\      ",
-            "    VICTORY!   ",
-            "   .  o   .    ",
-            "  .  _|_  .    ",
-            " .  /   \\  .   ",
-            "   |_____|     "
-    };
-
-    private final String[] lossAscii = {
-            "      ______     ",
-            "     /      \\    ",
-            "    |  O__O  |   ",
-            "    |   --   |   ",
-            "     \\______/    ",
-            "       |  |      ",
-            "      /|__|\\     ",
-            "     / |  | \\    ",
-            "    /  |  |  \\   ",
-            "       |  |      ",
-            "      _|  |_     "
-    };
 
     public LevelResult(boolean isWin, int score, int requiredScore, String rank, Runnable onEnterPressed) {
         this.isWin = isWin;
@@ -74,11 +51,19 @@ public class LevelResult extends Screen {
         setBackground(BG_COLOR);
         setFocusable(true);
 
-        // Load fonts (Fallback to Monospaced if JetBrains isn't installed)
-        fontMono = new Font("Monospaced", Font.PLAIN, 12);
-        fontTitle = new Font("Monospaced", Font.BOLD, 48);
-        fontStats = new Font("Monospaced", Font.BOLD, 24);
-
+//        // Load fonts (Fallback to Monospaced if JetBrains isn't installed)
+//        fontMono = new Font("Monospaced", Font.PLAIN, 12);
+//        fontTitle = new Font("Monospaced", Font.BOLD, 60);
+//        fontStats = new Font("Monospaced", Font.BOLD, 24);
+        try {
+            fontTitle= new Font("JetBrains Mono", Font.BOLD, 60);
+            fontMono = new Font("Monospaced", Font.PLAIN, 24);
+            fontStats = new Font("Monospaced", Font.BOLD, 18);
+        } catch (Exception e) {
+            fontTitle = new Font("Monospaced", Font.BOLD, 60);
+            fontMono = new Font("Monospaced", Font.PLAIN, 24);
+            fontStats = new Font("Monospaced", Font.BOLD, 10);
+        }
         addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
@@ -134,16 +119,12 @@ public class LevelResult extends Screen {
         int height = getHeight();
         int centerX = width / 2;
 
-        Color themeColor = isWin ? GREEN : RED;
+        Color themeColor = isWin ? CYAN : RED;
 
         // --- 1. HEADER ---
-        int currentY = 80;
-        g2.setFont(fontMono.deriveFont(Font.BOLD, 12f));
-        g2.setColor(TEXT_DIM);
-        String subHeader = isWin ? "--- MISSION REPORT ---" : "--- MISSION STATUS: FAILED ---";
-        drawCenteredString(g2, subHeader, centerX, currentY);
+        int currentY = 120;
 
-        currentY += 50;
+
         g2.setFont(fontTitle);
         String mainTitle = isWin ? "PARABÉNS!" : "NÍVEL NÃO COMPLETADO";
 
@@ -159,7 +140,7 @@ public class LevelResult extends Screen {
                 g2.setColor(CYAN);
                 drawCenteredString(g2, mainTitle, centerX + 4, currentY);
             }
-            g2.setColor(GREEN);
+            g2.setColor(CYAN);
         } else {
             int pulse = (int) (180 + Math.sin(timeTicks) * 75);
             g2.setColor(new Color(180, 50, 50, pulse));
@@ -169,14 +150,14 @@ public class LevelResult extends Screen {
         drawCenteredString(g2, mainTitle, centerX, currentY);
 
         // Decorator Line
-        currentY += 20;
-        g2.setColor(new Color(themeColor.getRed(), themeColor.getGreen(), themeColor.getBlue(), 120));
+        currentY += 30;
+        g2.setColor(new Color(themeColor.getRed(), themeColor.getGreen(), themeColor.getBlue(), 180));
         g2.drawLine(centerX - 60, currentY, centerX + 60, currentY);
 
         // --- 2. MAIN RPG BOX ---
-        currentY += 40;
-        int boxW = 800;
-        int boxH = 340;
+        currentY += 50;
+        int boxW = 860;
+        int boxH = 420;
         int boxX = centerX - (boxW / 2);
 
         g2.setColor(BORDER_DARK);
@@ -184,7 +165,7 @@ public class LevelResult extends Screen {
 
         Stroke oldStroke = g2.getStroke();
         float[] dash = {4f, 4f};
-        g2.setStroke(new BasicStroke(1f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10.0f, dash, 0.0f));
+        g2.setStroke(new BasicStroke(2f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10.0f, dash, 0.0f));
         g2.drawRect(boxX + 4, currentY + 4, boxW - 8, boxH - 8);
         g2.setStroke(oldStroke);
 
@@ -194,35 +175,33 @@ public class LevelResult extends Screen {
         int leftCenterX = boxX + 150;
         int asciiY = currentY + 60;
 
-        g2.setFont(fontMono.deriveFont(Font.BOLD, 14f));
+        g2.setFont(fontMono.deriveFont(Font.BOLD, 18f));
         g2.setColor(CYAN);
-        String[] asciiToDraw = isWin ? winAscii : lossAscii;
 
-        for (String line : asciiToDraw) {
-            drawCenteredString(g2, line, leftCenterX, asciiY);
-            asciiY += 16;
+   // Retrieve and split the string from your new AsciiArt file
+        String asciiData = isWin ? AsciiArt.WINASCII() : AsciiArt.LOSSASCII();
+        String[] asciiLines = asciiData.split("\n");
+
+        for (String line : asciiLines) {
+            // Avoid drawing empty lines if they exist at the end of your text block
+            if (!line.trim().isEmpty() || line.length() > 0) {
+                drawCenteredString(g2, line, leftCenterX, asciiY);
+                asciiY += 24;
+            }
         }
 
-        if (!isWin) {
-            g2.setColor(YELLOW);
-            g2.drawString("\"Wait...\"", leftCenterX + 60, currentY + 90);
-        }
 
-        g2.setFont(fontMono.deriveFont(10f));
-        g2.setColor(TEXT_DIM);
-        String charStatus = isWin ? "[ CHAR_STATUS: HAPPY ]" : "[ CHAR_STATUS: DETERMINED ]";
-        drawCenteredString(g2, charStatus, leftCenterX, asciiY + 30);
 
         // --- 4. RIGHT CONTENT (STATS GRID) ---
         int rightStartX = boxX + 300;
         int statsY = currentY + 40;
         int cellW = 230;
-        int cellH = 65;
+        int cellH = 85;
 
         drawStatCell(g2, rightStartX, statsY, cellW, cellH, "CHALLENGES CLEARED",
                 String.format("%02d", completedChallenges), "/" + totalChallenges, Color.WHITE, TEXT_DIM);
 
-        String rankSub = isWin ? "[Elite]" : "[Failed]";
+        String rankSub = isWin ? "" : "";
         Color rankColor = isWin ? YELLOW : TEXT_DIM;
         drawStatCell(g2, rightStartX + cellW + 15, statsY, cellW, cellH, "RANK", rank, rankSub, rankColor, TEXT_DIM);
 
@@ -230,6 +209,7 @@ public class LevelResult extends Screen {
         int scoreCellY = statsY + cellH + 15;
 
         g2.setColor(PANEL_BG);
+        g2.setFont(fontMono.deriveFont(14f));
         g2.fillRect(rightStartX, scoreCellY, scoreCellW, cellH);
         g2.setColor(BORDER_DARK);
         g2.drawRect(rightStartX, scoreCellY, scoreCellW, cellH);
@@ -240,7 +220,7 @@ public class LevelResult extends Screen {
             g2.fillRect(rightStartX, scoreCellY + cellH - 4, Math.min(barWidth, scoreCellW), 4);
         }
 
-        g2.setFont(fontMono.deriveFont(10f));
+        g2.setFont(fontMono.deriveFont(14f));
         g2.setColor(TEXT_DIM);
         g2.drawString("LEVEL SCORE", rightStartX + 15, scoreCellY + 20);
         g2.setFont(fontStats);
@@ -248,7 +228,7 @@ public class LevelResult extends Screen {
         g2.drawString(String.format("%,d", score) + " PTS", rightStartX + 15, scoreCellY + 50);
 
         if (!isWin) {
-            g2.setFont(fontMono.deriveFont(10f));
+            g2.setFont(fontMono.deriveFont(14f));
             g2.setColor(YELLOW);
             String reqStr = "REQUIREMENT";
             int reqW = g2.getFontMetrics().stringWidth(reqStr);
@@ -261,22 +241,22 @@ public class LevelResult extends Screen {
             g2.drawString(reqVal, rightStartX + scoreCellW - reqValW - 15, scoreCellY + 48);
         }
 
-        int msgY = scoreCellY + cellH + 30;
+        int msgY = scoreCellY + cellH + 40;
         g2.setColor(isWin ? GREEN : YELLOW);
         g2.fillRect(rightStartX, msgY, 3, 40);
 
-        g2.setFont(fontMono.deriveFont(14f));
+        g2.setFont(fontMono.deriveFont(15f));
         if (isWin) {
             g2.setColor(Color.LIGHT_GRAY);
-            g2.drawString("Você venceu! ", rightStartX + 15, msgY + 15);
+            g2.drawString("Você venceu! ", rightStartX + 15, msgY + 25);
             g2.setColor(GREEN);
-            g2.drawString("Próximo nível desbloqueado!", rightStartX + 115, msgY + 15);
+            g2.drawString("Próximo nível desbloqueado!", rightStartX + 145, msgY + 25);
         } else {
             g2.setColor(YELLOW);
-            g2.drawString("Você não atingiu a pontuação necessária para prosseguir.", rightStartX + 15, msgY + 15);
-            g2.setFont(fontMono.deriveFont(11f));
+            g2.drawString("Você não atingiu a pontuação necessária para prosseguir.", rightStartX + 8, msgY + 15);
+            g2.setFont(fontMono.deriveFont(15f));
             g2.setColor(TEXT_DIM);
-            g2.drawString("Você terá de repetir o nível para atingir a pontuação.", rightStartX + 15, msgY + 35);
+            g2.drawString("Você terá de repetir o nível para atingir a pontuação.", rightStartX + 10, msgY + 35);
         }
 
         // --- 5. FOOTER (ARROW & ENTER BOX) ---
@@ -318,7 +298,7 @@ public class LevelResult extends Screen {
         g2.setColor(BORDER_DARK);
         g2.drawRect(x, y, w, h);
 
-        g2.setFont(fontMono.deriveFont(10f));
+        g2.setFont(fontMono.deriveFont(14f));
         g2.setColor(TEXT_DIM);
         g2.drawString(title, x + 10, y + 20);
 
@@ -327,7 +307,7 @@ public class LevelResult extends Screen {
         g2.drawString(mainVal, x + 10, y + 50);
 
         int mainValWidth = g2.getFontMetrics().stringWidth(mainVal);
-        g2.setFont(fontMono.deriveFont(12f));
+        g2.setFont(fontMono.deriveFont(14f));
         g2.setColor(subColor);
         g2.drawString(subVal, x + 10 + mainValWidth + 5, y + 50);
     }
