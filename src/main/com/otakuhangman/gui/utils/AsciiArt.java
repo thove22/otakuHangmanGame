@@ -86,4 +86,36 @@ public final class AsciiArt {
                 """;
     }
 
+    public static String WINASCII() {
+        return """
+              ___________
+             '._==_==_=_.'
+             .-\\:      /-.
+             | (|:.     |) |
+             '-|:.     |-'
+             \\::.    /
+              '::. .'
+              ) (
+              _.' '._
+             `-------`
+           """;
+    }
+
+    public static String LOSSASCII() {
+        return """
+         ______      
+        /      \\    
+        |  O__O  |   
+        |   --   |   
+        \\______/    
+         |  | 
+              
+         /|__|\\     
+         / |  | \\    
+         /  |  |  \\   
+         |  |      
+         _|  |_  
+        """;
+    };
+
 }
