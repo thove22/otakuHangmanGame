@@ -1,9 +1,11 @@
 package main.com.otakuhangman.gui.screens;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Path2D;
 import java.util.Random;
 import main.com.otakuhangman.gui.Screen;
 import main.com.otakuhangman.core.Rank;
@@ -21,51 +23,68 @@ public class RankAchieved extends Screen {
     private final Rank newRank;
     private final Runnable onEnterPressed;
     private final String fullMessage;
-    private final String kanji;
 
     // --- Animations ---
     private Timer timer;
     private float timeTicks = 0;
     private final Random random = new Random();
+    private int lightningTicks = 0;
+    private Path2D currentLightning;
+
+    // Speed Regulators
+    private int rainTick = 0;
+    private int typeTick = 0;
 
     // Typewriter
     private int typewriterIndex = 0;
     private int typeDelayTicks = 60; // Wait ~1 second before typing
 
     // Matrix Rain
-    private static final int FONT_SIZE = 14;
+    private static final int FONT_SIZE = 16;
     private int[] drops;
     private final String matrixChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789$#@%&*";
 
     // Fonts
-    private final Font fontMono = new Font("Monospaced", Font.PLAIN, 14);
-    private final Font fontTitle = new Font("Monospaced", Font.BOLD, 64);
-    private final Font fontKanji = new Font("SansSerif", Font.BOLD, 180);
+    private final Font fontMono = new Font("Monospaced", Font.PLAIN, 16);
+    private final Font fontTitle = new Font(Font.SANS_SERIF, Font.BOLD, 65);
 
     public RankAchieved(Rank newRank, Runnable onEnterPressed) {
         this.newRank = newRank;
         this.onEnterPressed = onEnterPressed;
 
         this.fullMessage = getRankMessage(newRank);
-        this.kanji = getRankKanji(newRank);
 
         setBackground(BG_COLOR);
         setFocusable(true);
 
         // Initialize Matrix Rain (Assuming max width of ~1920)
         drops = new int[1920 / FONT_SIZE];
-        for (int i = 0; i < drops.length; i++) drops[i] = random.nextInt(50); // Random start positions
+        for (int i = 0; i < drops.length; i++) drops[i] = random.nextInt(50);
 
         // 60 FPS Timer
         timer = new Timer(16, e -> {
-            timeTicks += 0.1f;
-            updateMatrix();
+            timeTicks += 0.05f;
 
-            // Typewriter logic
+            // --- ADD THIS LIGHTNING LOGIC ---
+            if (lightningTicks > 0) {
+                lightningTicks--;
+            } else if (random.nextInt(450) == 0) { // ~1 in 450 chance per frame
+                lightningTicks = 10 + random.nextInt(10); // Flash duration
+                currentLightning = generateLightningPath();
+            }
+            // --------------------------------
+
+            rainTick++;
+
+            // Slowed down Typewriter logic
             if (typeDelayTicks > 0) {
                 typeDelayTicks--;
-            } else if (typewriterIndex < fullMessage.length() && timeTicks % 2 < 1) { // Speed controller
-                typewriterIndex++;
+            } else {
+                typeTick++;
+                // Types one character every 3 frames
+                if (typewriterIndex < fullMessage.length() && typeTick % 3 == 0) {
+                    typewriterIndex++;
+                }
             }
 
             repaint();
@@ -119,103 +138,131 @@ public class RankAchieved extends Screen {
         g2.setFont(fontMono);
         for (int i = 0; i < drops.length; i++) {
             char c = matrixChars.charAt(random.nextInt(matrixChars.length()));
-            float chance = random.nextFloat();
-            if (chance > 0.98f) g2.setColor(new Color(YELLOW.getRed(), YELLOW.getGreen(), YELLOW.getBlue(), 80));
-            else if (chance > 0.95f) g2.setColor(new Color(255, 255, 255, 80));
-            else g2.setColor(new Color(CYAN.getRed(), CYAN.getGreen(), CYAN.getBlue(), 40)); // Dim rain
+
+            // --- REPLACE YOUR COLOR LOGIC WITH THIS ---
+            if (lightningTicks > 0 && random.nextBoolean()) {
+                g2.setColor(Color.WHITE); // Glitch effect during thunder
+            } else {
+                float chance = random.nextFloat();
+                if (chance > 0.98f) g2.setColor(new Color(YELLOW.getRed(), YELLOW.getGreen(), YELLOW.getBlue(), 80));
+                else if (chance > 0.95f) g2.setColor(new Color(255, 255, 255, 80));
+                else g2.setColor(new Color(CYAN.getRed(), CYAN.getGreen(), CYAN.getBlue(), 40));
+            }
+            // ------------------
 
             g2.drawString(String.valueOf(c), i * FONT_SIZE, drops[i] * FONT_SIZE);
         }
+        if (lightningTicks > 0 && currentLightning != null) {
+            // Full screen flash
+            g2.setColor(new Color(255, 255, 255, 20 + (lightningTicks * 4)));
+            g2.fillRect(0, 0, getWidth(), getHeight());
+
+            // The Bolt
+            g2.setStroke(new BasicStroke(2f + random.nextInt(3)));
+            g2.setColor(CYAN);
+            g2.draw(currentLightning);
+
+            // Core of the bolt
+            g2.setColor(Color.WHITE);
+            g2.setStroke(new BasicStroke(1f));
+            g2.draw(currentLightning);
+        }
 
         // 2. Top Status Bar
-        g2.setFont(fontMono.deriveFont(Font.BOLD, 12f));
+        g2.setFont(fontMono.deriveFont(Font.BOLD, 16f));
         g2.setColor(DIM);
         g2.drawString("[ SYSTEM_ALERT: RANK_UPGRADE_INITIATED ]", 40, 40);
         g2.setColor(CYAN);
-        g2.drawString("// V.5.0.1 //", getWidth() - 140, 40);
+        g2.drawString("Required Points: " + newRank.getRequiredPoints(), getWidth() - 240, 40);
 
-        // Blinking indicator
-        if ((int)(timeTicks * 2) % 2 == 0) {
+        if ((int)(timeTicks * 3 ) % 6 == 4) { // Slowed down blink
             g2.setColor(YELLOW);
             g2.fillOval(20, 31, 10, 10);
         }
 
-        // 3. Center Kanji & Rotating Circles
-        int kanjiY = cy - 80;
-
-        AffineTransform oldTx = g2.getTransform();
-        g2.setStroke(new BasicStroke(2f));
-
-        // Inner Circle (Spins right)
-        g2.translate(cx, kanjiY - 50);
-        g2.rotate(timeTicks * 0.05);
-        g2.setColor(new Color(CYAN.getRed(), CYAN.getGreen(), CYAN.getBlue(), 50));
-        g2.drawOval(-120, -120, 240, 240);
-        g2.setTransform(oldTx);
-
-        // Outer Dashed Circle (Spins left)
-        g2.translate(cx, kanjiY - 50);
-        g2.rotate(-timeTicks * 0.03);
-        g2.setStroke(new BasicStroke(1f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10f, new float[]{10f}, 0f));
-        g2.setColor(new Color(YELLOW.getRed(), YELLOW.getGreen(), YELLOW.getBlue(), 30));
-        g2.drawOval(-150, -150, 300, 300);
-        g2.setTransform(oldTx);
-        g2.setStroke(new BasicStroke(1f));
-
-        // Draw Kanji
-        g2.setFont(fontKanji);
-        g2.setColor(new Color(255, 255, 255, 40)); // High transparency
-        drawCenteredString(g2, kanji, cx, kanjiY);
+        // 3. Mahoraga Wheel Background
+        int wheelY = cy - 120;
+        drawMahoragaWheel(g2, cx, wheelY, timeTicks);
 
         // 4. Main Title (Glitch Effect)
         String title = newRank.name();
         g2.setFont(fontTitle);
-        if (random.nextInt(100) > 90) { // Glitch randomly
-            g2.setColor(RED); drawCenteredString(g2, title, cx - 4, kanjiY + 30);
-            g2.setColor(CYAN); drawCenteredString(g2, title, cx + 4, kanjiY + 30);
+        FontMetrics fm = g2.getFontMetrics();
+        int tw = fm.stringWidth(title);
+        int th = fm.getHeight();
+        int tx = cx - tw / 2;
+        int ty = wheelY + 90;
+
+        GradientPaint grad = new GradientPaint(tx, ty, CYAN, tx + tw, ty, RED);
+        // Glitch chance reduced to ~2% for a rarer, slower glitch effect
+        if (random.nextInt(100) > 92) {
+            g2.setColor(new Color(255, 0, 0, 180));
+            g2.drawString(title, tx - (random.nextInt(8) - 4), ty + (random.nextInt(4) - 2));
+            g2.setColor(new Color(0, 255, 255, 180));
+            g2.drawString(title, tx + (random.nextInt(8) - 4), ty + (random.nextInt(4) - 2));
+
+            for (int s = 0; s < 3; s++) { // Create 3 random slices
+                int sliceY = random.nextInt(th);
+                int sliceH = 5 + random.nextInt(15);
+                int xOffset = random.nextInt(30) - 15;
+
+                Shape oldClip = g2.getClip();
+                // Set the clip to a thin horizontal strip
+                g2.setClip(tx - 50, ty - th + sliceY, tw + 100, sliceH);
+
+                // Draw the slice in a random "glitch" color
+                g2.setColor(random.nextBoolean() ? CYAN : Color.WHITE);
+                g2.drawString(title, tx + xOffset, ty);
+
+                g2.setClip(oldClip);
+            }
+
+            // 3. Digital Noise (Small white/cyan rectangles)
+            for (int n = 0; n < 5; n++) {
+                g2.setColor(random.nextBoolean() ? CYAN : YELLOW);
+                g2.fillRect(tx + random.nextInt(tw), ty - random.nextInt(th), random.nextInt(20), 2);
+            }
         }
-        g2.setColor(CYAN);
-        drawCenteredString(g2, title, cx, kanjiY + 30);
+        g2.setPaint(grad);
+        g2.drawString(title, tx, ty);
 
         g2.setFont(fontMono.deriveFont(Font.BOLD, 10f));
         g2.setColor(DIM);
-        drawCenteredString(g2, "LEVEL " + newRank.getRequiredPoints() + " ACHIEVED", cx, kanjiY + 60);
+        drawCenteredString(g2, " " + " ", cx, wheelY + 60);
 
         // 5. Typewriter Box
         int boxW = 600, boxH = 100;
         int boxX = cx - (boxW / 2);
-        int boxY = kanjiY + 120;
+        int boxY = wheelY + 210;
 
         g2.setColor(PANEL_BG);
         g2.fillRect(boxX, boxY, boxW, boxH);
         g2.setColor(BORDER);
         g2.drawRect(boxX, boxY, boxW, boxH);
 
-        // Corner accents
         g2.setColor(CYAN);
         g2.drawLine(boxX, boxY, boxX + 10, boxY); g2.drawLine(boxX, boxY, boxX, boxY + 10);
         g2.drawLine(boxX + boxW, boxY + boxH, boxX + boxW - 10, boxY + boxH); g2.drawLine(boxX + boxW, boxY + boxH, boxX + boxW, boxY + boxH - 10);
 
-        // Typewriter Text
-        g2.setFont(fontMono.deriveFont(Font.BOLD, 16f));
+        g2.setFont(fontMono.deriveFont(Font.BOLD, 20f));
         g2.setColor(Color.WHITE);
         String printedText = fullMessage.substring(0, typewriterIndex);
         drawCenteredString(g2, printedText, cx, boxY + 55);
 
-        // Cursor
-        if (typewriterIndex < fullMessage.length() || (int)(timeTicks * 2) % 2 == 0) {
+        // Cursor blink slowed down
+        if (typewriterIndex < fullMessage.length() || (int)(timeTicks * 4) % 6 == 0) {
             int textWidth = g2.getFontMetrics().stringWidth(printedText);
             g2.setColor(CYAN);
             g2.fillRect(cx + (textWidth / 2) + 2, boxY + 42, 8, 16);
         }
 
         // 6. Footer Diamond Badge
-        int diamondY = boxY + boxH + 60;
+        int diamondY = boxY + boxH + 100;
+        AffineTransform oldTx = g2.getTransform();
         g2.translate(cx, diamondY);
-        g2.rotate(Math.PI / 4); // Rotate 45 degrees
+        g2.rotate(Math.PI / 4);
 
-        // Pulsing glow
-        int pulse = (int) (Math.sin(timeTicks * 0.1) * 5);
+        int pulse = (int) (Math.sin(timeTicks * 0.1) * 2); // Slower pulse
         g2.setColor(new Color(CYAN.getRed(), CYAN.getGreen(), CYAN.getBlue(), 50));
         g2.fillRect(-30 - pulse, -30 - pulse, 60 + pulse*2, 60 + pulse*2);
 
@@ -223,26 +270,144 @@ public class RankAchieved extends Screen {
         g2.fillRect(-30, -30, 60, 60);
         g2.setColor(YELLOW);
         g2.drawRect(-30, -30, 60, 60);
-        g2.setTransform(oldTx); // Reset rotation
+        g2.setTransform(oldTx);
 
-        // Draw simple Crown inside Diamond (using ASCII for simplicity)
         g2.setColor(YELLOW);
         g2.setFont(fontTitle.deriveFont(32f));
         drawCenteredString(g2, "♔", cx, diamondY + 10);
 
-        // 7. Footer text
-        g2.setFont(fontMono.deriveFont(Font.BOLD, 12f));
-        g2.setColor(DIM);
-        drawCenteredString(g2, "PRESSIONE [ENTER] PARA CONTINUAR", cx, diamondY + 80);
+        // 7. Enhanced "Press Enter" Section
+        drawPressEnterSection(g2, cx, diamondY + 80, timeTicks);
+
         g2.setFont(fontMono.deriveFont(8f));
-        drawCenteredString(g2, "SESSION_ID: #8X92-QA", cx, diamondY + 100);
+        g2.setColor(DIM);
+        drawCenteredString(g2, "SESSION_ID: #8X92-QA", cx, diamondY + 120);
+    }
+
+    private void drawMahoragaWheel(Graphics2D g2, int cx, int cy, float time) {
+        AffineTransform oldTx = g2.getTransform();
+        g2.translate(cx, cy);
+
+        // Scale factor to make it fit beautifully behind the text (Scale SVG coordinates up by 1.8x)
+        g2.scale(1.8, 1.8);
+
+        // Alpha to blend it into the background nicely
+        Composite originalComposite = g2.getComposite();
+        g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.4f));
+
+        Stroke solidThin = new BasicStroke(0.8f);
+        Stroke solidMed = new BasicStroke(1.5f);
+        Stroke solidThick = new BasicStroke(2.5f);
+        Stroke dashedOuter = new BasicStroke(1f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10f, new float[]{8f, 4f}, 0f);
+        Stroke dashedMid = new BasicStroke(0.5f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10f, new float[]{2f, 6f}, 0f);
+
+        // --- LAYER 1: Outer Layer (Slowest, Forward) ---
+        AffineTransform l1Tx = g2.getTransform();
+        g2.rotate(time * 0.01); // Slow spin
+
+        g2.setColor(DIM);
+        g2.setStroke(dashedOuter);
+        g2.drawOval(-82, -82, 164, 164); // Outer dash ring
+
+        g2.setStroke(solidThin);
+        // Cross lines
+        g2.drawLine(0, -75, 0, 75);
+        g2.drawLine(-75, 0, 75, 0);
+        g2.drawLine(-53, -53, 53, 53);
+        g2.drawLine(-53, 53, 53, -53);
+
+        g2.setColor(YELLOW);
+        g2.setStroke(solidMed);
+        // 8 Perimeter Circles (Radius 7 at Distance 82)
+        int[][] circlePoints = {{0,-82}, {0,82}, {-82,0}, {82,0}, {-58,-58}, {58,58}, {-58,58}, {58,-58}};
+        for (int[] p : circlePoints) {
+            g2.drawOval(p[0] - 7, p[1] - 7, 14, 14);
+        }
+        g2.setTransform(l1Tx);
+
+        // --- LAYER 3: Inner Core (Fastest, Forward) ---
+        AffineTransform l3Tx = g2.getTransform();
+        g2.rotate(time * 0.01); // Fast spin
+
+        g2.setColor(BORDER);
+        g2.setStroke(solidThick);
+        g2.drawOval(-40, -40, 80, 80);
+
+        g2.setColor(YELLOW);
+        g2.setStroke(solidThin);
+        g2.drawOval(-34, -34, 68, 68);
+
+        // Inner 8-point star polygon
+        g2.setColor(new Color(CYAN.getRed(), CYAN.getGreen(), CYAN.getBlue(), 120)); // Semi-transparent fill
+        Path2D star = new Path2D.Double();
+        star.moveTo(0, -25);  star.lineTo(6, -6);
+        star.lineTo(25, 0);   star.lineTo(6, 6);
+        star.lineTo(0, 25);   star.lineTo(-6, 6);
+        star.lineTo(-25, 0);  star.lineTo(-6, -6);
+        star.closePath();
+        g2.fill(star);
+
+        g2.setTransform(l3Tx);
+
+        // Reset composite and transform
+        g2.setComposite(originalComposite);
+        g2.setTransform(oldTx);
+    }
+
+    private Path2D generateLightningPath() {
+        Path2D path = new Path2D.Double();
+        int startX = random.nextInt(getWidth());
+        path.moveTo(startX, 0);
+
+        int currX = startX;
+        int currY = 0;
+        while (currY < getHeight()) {
+            currX += random.nextInt(160) - 80; // Horizontal jaggedness
+            currY += random.nextInt(100);      // Vertical progress
+            path.lineTo(currX, currY);
+        }
+        return path;
+    }
+
+    private void drawPressEnterSection(Graphics2D g2, int cx, int cy, float time) {
+        Font pressFont = fontMono.deriveFont(Font.BOLD, 18f);
+        g2.setFont(pressFont);
+        FontMetrics fm = g2.getFontMetrics();
+
+        String s1 = "PRESSIONE ";
+        String s2 = "[ENTER]";
+        String s3 = " PARA CONTINUAR";
+
+        int w1 = fm.stringWidth(s1);
+        int w2 = fm.stringWidth(s2);
+        int w3 = fm.stringWidth(s3);
+
+        int totalWidth = w1 + w2 + w3;
+        int startX = cx - (totalWidth / 2);
+
+        // Draw Gray text
+        g2.setColor(DIM);
+        g2.drawString(s1, startX, cy);
+        g2.drawString(s3, startX + w1 + w2, cy);
+
+        // Draw Glowing/Pulsing Cyan Text
+        // Calculate a sine wave pulse between ~100 and 255 for the Alpha channel
+        int alpha = (int) (175 + 80 * Math.sin(timeTicks * 0.2));
+        alpha = Math.max(0, Math.min(255, alpha)); // Ensure bounds
+
+        Color pulsingCyan = new Color(CYAN.getRed(), CYAN.getGreen(), CYAN.getBlue(), alpha);
+        g2.setColor(pulsingCyan);
+        g2.drawString(s2, startX + w1, cy);
+
+        // Underline effect underneath [ENTER]
+        int lineY = cy + 6;
+        g2.setStroke(new BasicStroke(2f));
+        g2.drawLine(startX + w1, lineY, startX + w1 + w2, lineY);
     }
 
     private void drawCenteredString(Graphics2D g2, String t, int x, int y) {
         g2.drawString(t, x - g2.getFontMetrics().stringWidth(t) / 2, y);
     }
-
-    // --- Helper Methods to adapt terminal logic ---
 
     private String getRankMessage(Rank r) {
         return switch (r) {
@@ -252,17 +417,6 @@ public class RankAchieved extends Screen {
             case ADVANCED_OTAKU -> "Kakkoii! Advanced Otaku alcançado! Você evoluiu!";
             case GOD_OTAKU -> "MASAKA! God Otaku conquistado! Você é imbatível!";
             default -> "Rank atualizado!";
-        };
-    }
-
-    private String getRankKanji(Rank r) {
-        return switch (r) {
-            case OTAKU_INICIANTE -> "初"; // Beginner
-            case OTAKU_NUTELLA -> "甘";  // Sweet/Naive
-            case MID_OTAKU -> "中";      // Middle
-            case ADVANCED_OTAKU -> "高"; // High
-            case GOD_OTAKU -> "神";      // God
-            default -> "上";             // Up
         };
     }
 }
