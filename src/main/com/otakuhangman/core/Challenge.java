@@ -128,7 +128,7 @@ public class Challenge {
         }
     }
 
-     boolean isTimeUp(){
+     public boolean isTimeUp(){
         return (System.nanoTime() - startTimeNs) >= timeLimitNs;
      }
 
@@ -136,11 +136,14 @@ public class Challenge {
         long remaingNs = timeLimitNs - (System.nanoTime() - startTimeNs);
         return Math.max(0, remaingNs / 1_000_000_000L);
      }
-     void startTimer(){
+     public long getRemainingSeconds(){
+        return remaingSeconds();
+     }
+     public  void startTimer(){
          this.startTimeNs = System.nanoTime();
      }
 
-    String getTriedLettersString(){
+    public  String getTriedLettersString(){
         if(triedLetters.isEmpty()){
             return "Nenhuma letra tentada";
         }
@@ -150,7 +153,7 @@ public class Challenge {
         return sorted.stream().map(String::valueOf).collect(Collectors.joining(", "));
     }
 
-    boolean isWon(){
+   public boolean isWon(){
         for(int i = 0; i < normalizedWord.length(); i++){
         if(Character.isLetter(normalizedWord.charAt(i)) &&!discoveredPositions[i]){
             return false;
@@ -159,7 +162,7 @@ public class Challenge {
         endReason = EndChallengeReason.WON;
         return true;
     }
-    boolean isLost(){
+   public boolean isLost(){
         if (isTimeUp()){
             endReason = EndChallengeReason.TIME_UP;
             return true;
@@ -174,17 +177,17 @@ public class Challenge {
         return false;
     }
 
-    boolean isMaxAttempsReached(){
+    public boolean isMaxAttempsReached(){
         return attemps >= maxAttemps;
     }
-    boolean isComplete(){
+    public boolean isComplete(){
         return isWon() || isLost();
     }
     public int getCurrentErrors(){
         return currentErrors;
     }
 
-    void reset(){
+    public void reset(){
         this.triedLetters.clear();
         this.currentErrors = 0;
         this.attemps = 0;
