@@ -10,13 +10,23 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Menu extends Screen {
+
+    public interface MenuSelectionHandler{
+        void onNewGame();
+        void onContinue();
+        void onQuit();
+        void onInstructions();
+    }
+
     private final Color HOVER_COLOR = new  Color(70, 100, 255);
     private final Color DEFAULT_COLOR = Color.WHITE;
     private List<Star> starField;
     private Timer animationTimer;
     private final int STAR_COUNT = 150;
+    private final MenuSelectionHandler selectionHandler;
 
-    public Menu() {
+    public Menu(MenuSelectionHandler selectionHandler) {
+        this.selectionHandler = selectionHandler;
         setLayout(new GridBagLayout());
         setBackground(Color.BLACK);
         GridBagConstraints gbc = new GridBagConstraints();
@@ -81,9 +91,19 @@ public class Menu extends Screen {
     }
     private void handleSelection(int choice){
         switch (choice){
-            case 1 -> System.out.println("Starting New Game...");
-            case 4 -> System.exit(0);
-            default -> System.out.println("Option " + choice + " selected.");
+            case 1 -> {
+                if (selectionHandler != null) selectionHandler.onNewGame();
+            }
+            case 2 -> {
+                if (selectionHandler != null) selectionHandler.onContinue();
+            }
+            case 3 -> {
+                if (selectionHandler != null) selectionHandler.onInstructions();
+            }
+            case 4 -> {
+                if (selectionHandler != null) selectionHandler.onQuit();
+            }
+            default -> {}
         }
     }
 
