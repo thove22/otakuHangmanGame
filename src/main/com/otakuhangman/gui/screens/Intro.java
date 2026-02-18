@@ -8,8 +8,10 @@ import java.awt.event.KeyEvent;
 
 public class Intro extends Screen {
     private JTextArea ascii;
+    private final Runnable onContinue;
 
-    public Intro(){
+    public Intro(Runnable onContinue){
+        this.onContinue = onContinue;
         setLayout(new GridBagLayout());
         setBackground(Color.BLACK);
         ascii = new JTextArea();
@@ -29,14 +31,15 @@ public class Intro extends Screen {
             @Override
             public void keyPressed(KeyEvent e) {
                 if(e.getKeyCode() == KeyEvent.VK_ENTER){
-                    System.out.println("Enter pressed! Moving to Character Selection...");
                     handleScreenTransition();
                 }
             }
         });
     }
     private void handleScreenTransition(){
-
+        if (onContinue != null){
+            onContinue.run();
+        }
     }
 
     public void onEnter() {
