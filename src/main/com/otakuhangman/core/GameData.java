@@ -5,7 +5,7 @@ import java.util.List;
 public final class GameData {
     private GameData(){}
 
-    static List<Level> createLevels(){
+    public  static List<Level> createLevels(){
         return List.of(
                 createLevel1(),
                 createLevel2(),

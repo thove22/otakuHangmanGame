@@ -24,11 +24,12 @@ public class AppCordinator {
     }
 
     public JPanel build(){
-        Intro intro = new Intro(()-> screenManager.show(MENU));
-        OnBoarding onBoarding = new OnBoarding(()-> screenManager.show(MENU));
+        Intro intro = new Intro(() -> screenManager.show(ONBOARDING));
+        OnBoarding onBoarding = new OnBoarding(() -> screenManager.show(MENU));
         Challenge challenge = new Challenge();
 
-        Menu menu = new Menu(new Menu.MenuSelectionHandler(){
+        Menu menu = new Menu(new Menu.MenuSelectionHandler() {
+            @Override
             public void onNewGame() {
                 screenManager.show(NAME_ENTRY);
             }
@@ -40,6 +41,7 @@ public class AppCordinator {
             public void onContinue() {
                 JOptionPane.showMessageDialog(screenManager.getRoot(), "Continue flow not implemented yet.");
             }
+
             @Override
             public void onQuit() {
                 System.exit(0);

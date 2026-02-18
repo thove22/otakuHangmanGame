@@ -33,12 +33,12 @@ public class Level {
       return requiredChallengesToPass;
    }
 
-   void resetLevel(){
+  public void resetLevel(){
       for (Challenge challenge : challenges){
             challenge.reset();
       }
    }
-   boolean canAdvanceToNextLevel(Player player ){
+    public boolean canAdvanceToNextLevel(Player player ){
       return player.getCurrentLevelScore() >= requiredScoreToPass &&
               player.getCompletedChallenges() >= requiredChallengesToPass;
    }

@@ -7,7 +7,7 @@ public record ChallengeViewState(
         int currentErrors,
         int attempts,
         int maxAttempts,
-        long remaingSeconds,
+        long remainingSeconds,
         boolean complete
 ) {
 

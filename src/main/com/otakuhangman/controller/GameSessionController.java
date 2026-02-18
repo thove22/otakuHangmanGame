@@ -31,11 +31,11 @@ public class GameSessionController {
         return currentChallenge.tryLetter(letter);
     }
 
-    public boolean isChallengeComplete(){
+    public boolean isCurrentChallengeComplete(){
         ensureSessionStarted();
         return  currentChallenge.isComplete();
     }
-    public  ChallengeResolution resolveCurrentChallenge(){
+    public ChallengeResolution resolveCurrentChallenge(){
         ensureSessionStarted();
 
         if(!currentChallenge.isComplete()){
@@ -67,7 +67,7 @@ public class GameSessionController {
         return true;
     }
 
-    public ChallengeViewState getCurrentChallengeStatus(){
+    public ChallengeViewState getCurrentChallengeState(){
         ensureSessionStarted();
         return new ChallengeViewState(
                 currentChallenge.getHint(),

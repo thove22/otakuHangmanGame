@@ -65,10 +65,11 @@ public class Player {
         updateRank();
         return points;
     }
-    int processChallengesResult(int errors){
+    public int processChallengesResult(int errors){
         return processChallenge(errors);
     }
-     void updateRank(){
+
+    public void updateRank(){
         Rank newRank = determineRankFromPoints(totalPoints);
 
         if(this.rank != newRank){
@@ -77,7 +78,7 @@ public class Player {
         }
     }
 
-     Rank determineRankFromPoints(int points){
+     public Rank determineRankFromPoints(int points){
         if (points >= Rank.OTAKU_NUTELLA.getRequiredPoints()) return  Rank.OTAKU_NUTELLA;
         if (points >= Rank.MID_OTAKU.getRequiredPoints()) return Rank.MID_OTAKU;
         if (points >= Rank.ADVANCED_OTAKU.getRequiredPoints()) return Rank.ADVANCED_OTAKU;
@@ -85,14 +86,14 @@ public class Player {
 
         return Rank.OTAKU_INICIANTE;
     }
-    void advanceToNextLevel(){
+    public void advanceToNextLevel(){
         currentLevel++;
         currentLevelScore = 0;
         currentStreak = 0;
         completedChallenges = 0;
     }
 
-    String getPlayerStatus(){
+   public String getPlayerStatus(){
         return "Score do nível: " + currentLevelScore +
                 "\nPontos totais: " + totalPoints +
                 "\nRank Actual: " + rank;

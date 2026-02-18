@@ -58,7 +58,7 @@ public class Challenge {
         return endReason;
     }
 
-    String getMaskedWord(){
+    public String getMaskedWord(){
      StringBuilder sb = new StringBuilder();
 
         for (int i = 0; i < normalizedWord.length(); i++){
@@ -73,6 +73,7 @@ public class Challenge {
         }
         return sb.toString().trim();
     }
+
 
   public AttemptResult tryLetter(char letter){
         if (isTimeUp()){
