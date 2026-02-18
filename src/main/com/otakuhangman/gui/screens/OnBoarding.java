@@ -11,12 +11,12 @@ public class OnBoarding extends Screen {
     private JTextArea textDisplay;
     private  int charIndex = 0;
     private Timer typewriterTimer;
+    private final Runnable onFinished;
 
-
-    public OnBoarding(){
+    public OnBoarding(Runnable onFinished){
+        this.onFinished = onFinished;
         setLayout(new GridBagLayout());
         setBackground(Color.BLACK);
-
         textDisplay = new JTextArea();
         textDisplay.setEditable(false);
         textDisplay.setFocusable(false);
@@ -34,7 +34,9 @@ public class OnBoarding extends Screen {
                    charIndex = fullText.length();
                    textDisplay.setText(AsciiArt.drawBoxAscii(fullText));
                }else {
-                   System.out.println("Entering the Game...");
+                   if (onFinished != null) {
+                       onFinished.run();
+                   }
                }
             }
         });
