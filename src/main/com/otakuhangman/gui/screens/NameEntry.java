@@ -2,6 +2,7 @@ package main.com.otakuhangman.gui.screens;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.util.function.Consumer;
 import java.awt.event.ActionListener;
 import main.com.otakuhangman.gui.Screen;
 import main.com.otakuhangman.gui.utils.AsciiArt;
@@ -9,8 +10,10 @@ import main.com.otakuhangman.gui.utils.AsciiArt;
 public class NameEntry extends Screen {
     private JTextField nameInput;
     private JTextArea textDisplay;
+    private final Consumer<String> onNameConfirmed;
 
-    public NameEntry(){
+    public NameEntry(Consumer<String> onNameConfirmed){
+        this.onNameConfirmed = onNameConfirmed;
         setLayout(new GridBagLayout());
         setBackground(Color.BLACK);
         GridBagConstraints gbc = new GridBagConstraints();
@@ -51,8 +54,9 @@ public class NameEntry extends Screen {
         add(footer, gbc);
     }
     private void proceedToGame(String name) {
-        System.out.println("Welcome, " + name);
-
+        if (onNameConfirmed != null) {
+            onNameConfirmed.accept(name);
+        }
     }
     public void onEnter() {
         nameInput.requestFocusInWindow();
