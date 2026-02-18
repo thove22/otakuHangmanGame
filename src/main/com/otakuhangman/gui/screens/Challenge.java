@@ -1,5 +1,9 @@
 package main.com.otakuhangman.gui.screens;
 
+import main.com.otakuhangman.controller.ChallengeResolution;
+import main.com.otakuhangman.controller.ChallengeViewState;
+import main.com.otakuhangman.controller.GameSessionController;
+import main.com.otakuhangman.core.AttemptResult;
 import main.com.otakuhangman.gui.Screen;
 import main.com.otakuhangman.core.HangmanArt;
 import javax.swing.*;
@@ -7,22 +11,22 @@ import javax.swing.border.*;
 import java.awt.*;
 
 public class Challenge extends Screen {
-    // --- UI COLOR PALETTE ---
     private final Color COLOR_CYAN = new Color(0, 190, 190);
     private final Color COLOR_RED = new Color(180, 50, 50);
     private final Color COLOR_YELLOW = new Color(200, 180, 50);
     private final Color COLOR_BG = new Color(13, 13, 13);
     private final Color COLOR_GALLOWS_BG = new Color(13, 13, 13);
-    private final Color COLOR_BORDER = new Color(50, 50, 50); // Dashed border color
+    private final Color COLOR_BORDER = new Color(50, 50, 50);
     private final Color COLOR_TEXT_DIM = new Color(90, 90, 90);
 
-    // --- COMPONENTS ---
     private JTextArea gallowsArea;
     private JLabel wordStatusLabel, hintLabel;
     private JLabel levelVal, challengeVal, scoreVal, timeVal;
     private JLabel feedbackBanner, attemptLettersVal, remainingText;
     private JTextField inputField;
     private JPanel feedbackPanel, triedLettersContainer;
+    private GameSessionController controller;
+    private Timer uiRefreshTimer;
 
     public Challenge() {
         setLayout(new BorderLayout());
@@ -190,13 +194,14 @@ public class Challenge extends Screen {
         inputTitle.setForeground(COLOR_CYAN);
         inputTitle.setFont(new Font("Monospaced", Font.BOLD, 14));
 
-        inputField = new JTextField(" ", 1); // Underscore placeholder
+        inputField = new JTextField(" ", 1);
         inputField.setBackground(COLOR_BG);
         inputField.setForeground(Color.WHITE);
         inputField.setFont(new Font("Monospaced", Font.BOLD, 32));
         inputField.setBorder(BorderFactory.createLineBorder(new Color(40, 40, 40), 2));
         inputField.setHorizontalAlignment(JTextField.CENTER);
         inputField.setPreferredSize(new Dimension(90, 60));
+        inputField.addActionListener((e)-> submitGuessFromInput());
 
         JLabel confirmText = new JLabel("Press [ENTER] to confirm", SwingConstants.CENTER);
         confirmText.setForeground(COLOR_TEXT_DIM);
@@ -236,6 +241,81 @@ public class Challenge extends Screen {
 
         return container;
     }
+    public  void setController(GameSessionController controller){
+         this.controller = controller;
+         refreshFromControllerState();
+    }
+    private void submitGuessFromInput(){
+        if (controller == null){
+            setFeedback("Controller not COnfigured", true);
+            return;
+        }
+        String rawInput = inputField.getText() == null ? "" : inputField.getText().trim();
+        if (rawInput.length() != 1){
+            setFeedback("Enter Exactly One Character", true);
+            return;
+        }
+        char guess  = rawInput.charAt(0);
+        AttemptResult result = controller.submitGuess(guess);
+        applyAttemptFeedBack(result);
+        refreshFromControllerState();
+        inputField.setText("");
+
+        if(controller.isCurrentChallengeComplete()){
+            ChallengeResolution resolution = controller.resolveCurrentChallenge();
+
+            if(resolution.won()){
+                setFeedback("You solved it! +" + resolution.pointsEarned() + " pts", false);
+            }else {
+                setFeedback("Challenge lost. Word: " + resolution.word(), true);
+            }
+        }
+    }
+    private  void applyAttemptFeedBack(AttemptResult result){
+        switch (result){
+            case CORRECT -> setFeedback("Correct guess!", false);
+            case WRONG -> setFeedback("Wrong guess!", true);
+            case ORDER_MISTAKE -> setFeedback("Wrong order!", true);
+            case REPEATED -> setFeedback("Letter already tried", true);
+            case TIME_UP -> setFeedback("Time is up!", true);
+        }
+    }
+    private void refreshFromControllerState(){
+        if (controller == null){
+            return;
+        }
+        ChallengeViewState state = controller.getCurrentChallengeState();
+        wordStatusLabel.setText(state.maskedWord());
+        hintLabel.setText(state.hint());
+        gallowsArea.setText(HangmanArt.STAGES[Math.max(0, Math.min(6, state.currentErrors()))]);
+
+        int filled = Math.min(6, Math.max(0, state.currentErrors()));
+        StringBuilder attemptsVisual = new StringBuilder();
+        for (int i = 0; i < 6; i++) {
+            attemptsVisual.append(i < filled ? "X" : "_");
+            if (i < 5) attemptsVisual.append(" ");
+        }
+        attemptLettersVal.setText(attemptsVisual.toString());
+
+        remainingText.setText("(" + Math.max(0, 6 - state.currentErrors()) + " / 6) REMAINING");
+        timeVal.setText(state.remainingSeconds() + "s");
+        scoreVal.setText(String.format("%05d PTS", controller.getCurrentPlayer().getTotalPoints()));
+        levelVal.setText(String.format("LVL %02d", controller.getCurrentPlayer().getCurrentLevel()));
+        challengeVal.setText("# " + (controller.getCurrentChallengeIndex() + 1));
+
+        renderTriedLetters(state.triedLetters());
+    }
+    private void renderTriedLetters(String triedLetters){
+        triedLettersContainer.removeAll();
+        if (triedLetters != null && !triedLetters.equals("Nenhuma letra tentada")) {
+            String[] letters = triedLetters.split(",");
+            for (String letter : letters) {
+                addTriedLetter(letter.trim());
+            }
+        }
+        triedLettersContainer.revalidate();
+        triedLettersContainer.repaint();
+    }
 
     private void addTriedLetter(String s) {
         JLabel letter = new JLabel(s, SwingConstants.CENTER);
@@ -261,8 +341,21 @@ public class Challenge extends Screen {
         feedbackPanel.setOpaque(true);
     }
 
-    @Override public void onEnter() { inputField.requestFocusInWindow(); }
-    @Override public void onExit() {}
+    @Override
+    public void onEnter() {
+        inputField.requestFocusInWindow();
+        if (uiRefreshTimer == null) {
+            uiRefreshTimer = new Timer(300, e -> refreshFromControllerState());
+        }
+        uiRefreshTimer.start();
+    }
+
+    @Override
+    public void onExit() {
+        if (uiRefreshTimer != null) {
+            uiRefreshTimer.stop();
+        }
+    }
 
     // Inner class for the dashed ASCII-style border
     private static class DashedBorder extends AbstractBorder {
