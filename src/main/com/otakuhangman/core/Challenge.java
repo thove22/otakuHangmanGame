@@ -20,7 +20,6 @@ public class Challenge {
     private int currentIndex;
     private long startTimeNs;
     private long timeLimitNs;
-    private EndChallengeReason endReason;
 
 
     public Challenge(String word, String hint, String category, boolean ordered){
@@ -55,7 +54,11 @@ public class Challenge {
     }
 
     public EndChallengeReason getEndReason() {
-        return endReason;
+        if (isWon()) return EndChallengeReason.WON;
+        if (isTimeUp()) return EndChallengeReason.TIME_UP;
+        if (currentErrors >= MAX_ERRORS) return EndChallengeReason.ERROR_LIMIT;
+        if (attemps >= maxAttemps) return EndChallengeReason.ATTEMPS_LIMIT;
+        return null;
     }
 
     public String getMaskedWord(){
@@ -76,10 +79,9 @@ public class Challenge {
 
 
   public AttemptResult tryLetter(char letter){
-        if (isTimeUp()){
-            return AttemptResult.TIME_UP;
+        if (isComplete()){
+            return isTimeUp() && !isWon() ? AttemptResult.TIME_UP : AttemptResult.CHALLENGE_OVER;
         }
-        attemps++;
 
         char upperLetter = Character.toUpperCase(letter);
 
@@ -87,6 +89,7 @@ public class Challenge {
             return AttemptResult.REPEATED;
         }
 
+        attemps++;
         triedLetters.add(upperLetter);
 
         if (!ordered){
@@ -160,22 +163,10 @@ public class Challenge {
             return false;
         }
         }
-        endReason = EndChallengeReason.WON;
         return true;
     }
    public boolean isLost(){
-        if (isTimeUp()){
-            endReason = EndChallengeReason.TIME_UP;
-            return true;
-        }
-        if (currentErrors >= MAX_ERRORS){
-            endReason = EndChallengeReason.ERROR_LIMIT;
-            return true;
-        }
-        if (attemps >= maxAttemps){
-            endReason = EndChallengeReason.ATTEMPS_LIMIT;
-        }
-        return false;
+        return !isWon() && (isTimeUp() || currentErrors >= MAX_ERRORS || attemps >= maxAttemps);
     }
 
     public boolean isMaxAttempsReached(){

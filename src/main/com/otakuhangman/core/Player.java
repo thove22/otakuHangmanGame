@@ -10,7 +10,7 @@ public class Player {
     private Rank rank;
 
     public  Player(String name){
-        this(name, 1, 0, 0, 0, 0, Rank.OTAKU_INICIANTE);
+        this(name, 0, 0, 0, 1, 0, Rank.OTAKU_INICIANTE);
     }
 
     public Player(String name,int currentLevelScore, int currentStreak , int totalPoints,
@@ -33,7 +33,7 @@ public class Player {
     public void setTotalPoints(int totalPoints) {this.totalPoints = totalPoints;}
     public void setCurrentLevel(int currentLevel) {this.currentLevel = currentLevel;}
     public int getCompletedChallenges() {return completedChallenges;}
-    public void setCompletedChallenges(int completedChalenges) {this.completedChallenges = completedChallenges;}
+    public void setCompletedChallenges(int completedChallenges) {this.completedChallenges = completedChallenges;}
     public Rank getRank() {return rank;}
     public void setRank(Rank rank) {this.rank = rank;}
     public int getCurrentLevel(){return this.currentLevel;}
@@ -79,10 +79,10 @@ public class Player {
     }
 
      public Rank determineRankFromPoints(int points){
-        if (points >= Rank.OTAKU_NUTELLA.getRequiredPoints()) return  Rank.OTAKU_NUTELLA;
-        if (points >= Rank.MID_OTAKU.getRequiredPoints()) return Rank.MID_OTAKU;
-        if (points >= Rank.ADVANCED_OTAKU.getRequiredPoints()) return Rank.ADVANCED_OTAKU;
         if (points >= Rank.GOD_OTAKU.getRequiredPoints()) return Rank.GOD_OTAKU;
+        if (points >= Rank.ADVANCED_OTAKU.getRequiredPoints()) return Rank.ADVANCED_OTAKU;
+        if (points >= Rank.MID_OTAKU.getRequiredPoints()) return Rank.MID_OTAKU;
+        if (points >= Rank.OTAKU_NUTELLA.getRequiredPoints()) return  Rank.OTAKU_NUTELLA;
 
         return Rank.OTAKU_INICIANTE;
     }
