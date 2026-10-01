@@ -83,7 +83,7 @@ public final class AsciiArt {
                                                     [ Pressione qualquer tecla para começar ]
                 
                                 ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
-                """;
+                """.stripIndent();
     }
 
     public static String WINASCII() {
