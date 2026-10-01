@@ -6,6 +6,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.util.Random;
 
 public class EndChallenge extends Screen implements ActionListener {
@@ -24,12 +26,13 @@ public class EndChallenge extends Screen implements ActionListener {
     private Color currentGlowColor;
 
     // --- STATE DATA ---
-    private final EndChallengeReason reason;
-    private final int totalScore;
-    private final int pointsGained;
-    private final String rank;
-    private final String word;
-    private final boolean isWon;
+    private EndChallengeReason reason = EndChallengeReason.WON;
+    private int totalScore;
+    private int pointsGained;
+    private String rank = "";
+    private String word = "";
+    private boolean isWon = true;
+    private final Runnable onContinue;
 
     // --- ANIMATION VARIABLES ---
     private final Timer timer;
@@ -40,13 +43,8 @@ public class EndChallenge extends Screen implements ActionListener {
     // Fonts
     private Font fontTitle, fontMain, fontMono, fontSmall;
 
-    public EndChallenge(EndChallengeReason reason, int totalScore, int pointsGained, String rank, String word) {
-        this.reason = reason;
-        this.totalScore = totalScore;
-        this.pointsGained = pointsGained;
-        this.rank = rank;
-        this.word = word;
-        this.isWon = (reason == EndChallengeReason.WON);
+    public EndChallenge(Runnable onContinue) {
+        this.onContinue = onContinue;
 
         // 1. Setup Theme based on result
         setupTheme();
@@ -64,14 +62,33 @@ public class EndChallenge extends Screen implements ActionListener {
             fontSmall = new Font("Monospaced", Font.BOLD, 10);
         }
 
-        // 3. Start Animation Loop (60 FPS)
+        // 3. Animation Loop (60 FPS), started in onEnter()
         timer = new Timer(16, this);
-        timer.start();
 
         // Hide standard layout manager since we are custom painting
         setLayout(null);
         setFocusable(true);
-        requestFocusInWindow();
+
+        addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                if (e.getKeyCode() == KeyEvent.VK_ENTER && onContinue != null) {
+                    onContinue.run();
+                }
+            }
+        });
+    }
+
+    /** Loads the result of the challenge that just ended; call before showing this screen. */
+    public void showResult(EndChallengeReason reason, int totalScore, int pointsGained, String rank, String word) {
+        this.reason = reason;
+        this.totalScore = totalScore;
+        this.pointsGained = pointsGained;
+        this.rank = rank;
+        this.word = word;
+        this.isWon = (reason == EndChallengeReason.WON);
+        setupTheme();
+        repaint();
     }
 
     private void setupTheme() {
@@ -301,5 +318,6 @@ public class EndChallenge extends Screen implements ActionListener {
         timeTicks = 0;
         scanlineY = 0;
         if (!timer.isRunning()) timer.start();
+        requestFocusInWindow();
     }
 }

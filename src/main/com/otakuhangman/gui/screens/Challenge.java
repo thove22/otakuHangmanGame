@@ -9,6 +9,8 @@ import main.com.otakuhangman.core.HangmanArt;
 import javax.swing.*;
 import javax.swing.border.*;
 import java.awt.*;
+import java.util.List;
+import java.util.function.Consumer;
 
 public class Challenge extends Screen {
     private final Color COLOR_CYAN = new Color(0, 190, 190);
@@ -25,10 +27,17 @@ public class Challenge extends Screen {
     private JLabel feedbackBanner, attemptLettersVal, remainingText;
     private JTextField inputField;
     private JPanel feedbackPanel, triedLettersContainer;
-    private GameSessionController controller;
-    private Timer uiRefreshTimer;
+    private static final int FINISH_DELAY_MS = 1500;
 
-    public Challenge() {
+    private final GameSessionController controller;
+    private final Consumer<ChallengeResolution> onChallengeFinished;
+    private Timer uiRefreshTimer;
+    private Timer finishDelayTimer;
+    private boolean finished;
+
+    public Challenge(GameSessionController controller, Consumer<ChallengeResolution> onChallengeFinished) {
+        this.controller = controller;
+        this.onChallengeFinished = onChallengeFinished;
         setLayout(new BorderLayout());
         setBackground(COLOR_BG);
 
@@ -65,10 +74,10 @@ public class Challenge extends Screen {
         p.setBackground(COLOR_BG);
         p.setBorder(new DashedBorder(COLOR_BORDER)); // Custom dashed ASCII border
 
-        levelVal = createHudItem(p, "LEVEL STATUS", "LVL 01/05", COLOR_CYAN);
-        challengeVal = createHudItem(p, "CURRENT CHALLENGE", "# 1 of 10", Color.WHITE);
-        scoreVal = createHudItem(p, "TOTAL SCORE", "00500 PTS", COLOR_YELLOW);
-        timeVal = createHudItem(p, "TIME REMAINING", "08s", COLOR_RED);
+        levelVal = createHudItem(p, "LEVEL STATUS", "LVL --", COLOR_CYAN);
+        challengeVal = createHudItem(p, "CURRENT CHALLENGE", "# --", Color.WHITE);
+        scoreVal = createHudItem(p, "TOTAL SCORE", "00000 PTS", COLOR_YELLOW);
+        timeVal = createHudItem(p, "TIME REMAINING", "--s", COLOR_RED);
         return p;
     }
 
@@ -128,7 +137,7 @@ public class Challenge extends Screen {
                 BorderFactory.createEmptyBorder(10, 15, 10, 15)
         ));
 
-        hintLabel = new JLabel("\"A powerful emotion that drives the protagonist...\"");
+        hintLabel = new JLabel("");
         hintLabel.setForeground(COLOR_TEXT_DIM);
         hintLabel.setFont(new Font("Monospaced", Font.ITALIC, 18));
         JLabel hintTag = new JLabel("[HINT] ");
@@ -141,7 +150,7 @@ public class Challenge extends Screen {
         wordSection.add(hintBox, wg);
 
         // Masked Word
-        wordStatusLabel = new JLabel("O _ A _ U");
+        wordStatusLabel = new JLabel("");
         wordStatusLabel.setFont(new Font("Monospaced", Font.BOLD, 32));
         wordStatusLabel.setForeground(Color.WHITE);
         wg.gridy = 1; wg.insets = new Insets(0, 20, 0, 20);
@@ -179,9 +188,6 @@ public class Challenge extends Screen {
 
         triedLettersContainer = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 5));
         triedLettersContainer.setOpaque(false);
-        // Placeholder boxes with slashes (Risqued)
-        String[] demo = {"A", "E", "I", "X", "Z"};
-        for(String s : demo) addTriedLetter(s);
 
         triedWrap.add(triedTitle, BorderLayout.NORTH);
         triedWrap.add(triedLettersContainer, BorderLayout.CENTER);
@@ -194,7 +200,7 @@ public class Challenge extends Screen {
         inputTitle.setForeground(COLOR_CYAN);
         inputTitle.setFont(new Font("Monospaced", Font.BOLD, 14));
 
-        inputField = new JTextField(" ", 1);
+        inputField = new JTextField("", 1);
         inputField.setBackground(COLOR_BG);
         inputField.setForeground(Color.WHITE);
         inputField.setFont(new Font("Monospaced", Font.BOLD, 32));
@@ -225,11 +231,11 @@ public class Challenge extends Screen {
         lpTitle.setForeground(COLOR_TEXT_DIM);
         lpTitle.setFont(new Font("Monospaced", Font.PLAIN, 14));
 
-        attemptLettersVal = new JLabel("X X X _ _ _", SwingConstants.RIGHT);
+        attemptLettersVal = new JLabel("_ _ _ _ _ _", SwingConstants.RIGHT);
         attemptLettersVal.setFont(new Font("Monospaced", Font.BOLD, 24));
         attemptLettersVal.setForeground(COLOR_RED);
 
-        remainingText = new JLabel("(3 / 6) REMAINING", SwingConstants.RIGHT);
+        remainingText = new JLabel("(6 / 6) REMAINING", SwingConstants.RIGHT);
         remainingText.setForeground(COLOR_RED);
         remainingText.setFont(new Font("Monospaced", Font.PLAIN, 12));
 
@@ -241,13 +247,8 @@ public class Challenge extends Screen {
 
         return container;
     }
-    public  void setController(GameSessionController controller){
-         this.controller = controller;
-         refreshFromControllerState();
-    }
     private void submitGuessFromInput(){
-        if (controller == null){
-            setFeedback("Controller not COnfigured", true);
+        if (finished){
             return;
         }
         String rawInput = inputField.getText() == null ? "" : inputField.getText().trim();
@@ -262,14 +263,28 @@ public class Challenge extends Screen {
         inputField.setText("");
 
         if(controller.isCurrentChallengeComplete()){
-            ChallengeResolution resolution = controller.resolveCurrentChallenge();
-
-            if(resolution.won()){
-                setFeedback("You solved it! +" + resolution.pointsEarned() + " pts", false);
-            }else {
-                setFeedback("Challenge lost. Word: " + resolution.word(), true);
-            }
+            finishChallenge();
         }
+    }
+
+    /** Scores the challenge once, shows the outcome briefly, then hands over to the coordinator. */
+    private void finishChallenge(){
+        if (finished){
+            return;
+        }
+        finished = true;
+        inputField.setEnabled(false);
+        ChallengeResolution resolution = controller.resolveCurrentChallenge();
+
+        if(resolution.won()){
+            setFeedback("You solved it! +" + resolution.pointsEarned() + " pts", false);
+        }else {
+            setFeedback("Challenge lost. Word: " + resolution.word(), true);
+        }
+
+        finishDelayTimer = new Timer(FINISH_DELAY_MS, e -> onChallengeFinished.accept(resolution));
+        finishDelayTimer.setRepeats(false);
+        finishDelayTimer.start();
     }
     private  void applyAttemptFeedBack(AttemptResult result){
         switch (result){
@@ -282,9 +297,6 @@ public class Challenge extends Screen {
         }
     }
     private void refreshFromControllerState(){
-        if (controller == null){
-            return;
-        }
         ChallengeViewState state = controller.getCurrentChallengeState();
         wordStatusLabel.setText(state.maskedWord());
         hintLabel.setText(state.hint());
@@ -301,18 +313,15 @@ public class Challenge extends Screen {
         remainingText.setText("(" + Math.max(0, 6 - state.currentErrors()) + " / 6) REMAINING");
         timeVal.setText(state.remainingSeconds() + "s");
         scoreVal.setText(String.format("%05d PTS", controller.getCurrentPlayer().getTotalPoints()));
-        levelVal.setText(String.format("LVL %02d", controller.getCurrentPlayer().getCurrentLevel()));
-        challengeVal.setText("# " + (controller.getCurrentChallengeIndex() + 1));
+        levelVal.setText(String.format("LVL %02d/%02d", controller.getCurrentLevelIndex() + 1, controller.getTotalLevels()));
+        challengeVal.setText("# " + (controller.getCurrentChallengeIndex() + 1) + " of " + controller.getCurrentLevelChallengeCount());
 
         renderTriedLetters(state.triedLetters());
     }
-    private void renderTriedLetters(String triedLetters){
+    private void renderTriedLetters(List<Character> triedLetters){
         triedLettersContainer.removeAll();
-        if (triedLetters != null && !triedLetters.equals("Nenhuma letra tentada")) {
-            String[] letters = triedLetters.split(",");
-            for (String letter : letters) {
-                addTriedLetter(letter.trim());
-            }
+        for (Character letter : triedLetters) {
+            addTriedLetter(String.valueOf(letter));
         }
         triedLettersContainer.revalidate();
         triedLettersContainer.repaint();
@@ -344,9 +353,22 @@ public class Challenge extends Screen {
 
     @Override
     public void onEnter() {
+        finished = false;
+        inputField.setEnabled(true);
+        inputField.setText("");
+        setFeedback("", false);
+        // The challenge may have been prepared while a result screen was showing, so start its clock now.
+        controller.startCurrentChallengeTimer();
+        refreshFromControllerState();
         inputField.requestFocusInWindow();
         if (uiRefreshTimer == null) {
-            uiRefreshTimer = new Timer(300, e -> refreshFromControllerState());
+            uiRefreshTimer = new Timer(300, e -> {
+                refreshFromControllerState();
+                // Ends the challenge when the clock runs out, without waiting for another guess.
+                if (!finished && controller.isCurrentChallengeComplete()) {
+                    finishChallenge();
+                }
+            });
         }
         uiRefreshTimer.start();
     }
@@ -355,6 +377,9 @@ public class Challenge extends Screen {
     public void onExit() {
         if (uiRefreshTimer != null) {
             uiRefreshTimer.stop();
+        }
+        if (finishDelayTimer != null) {
+            finishDelayTimer.stop();
         }
     }
 

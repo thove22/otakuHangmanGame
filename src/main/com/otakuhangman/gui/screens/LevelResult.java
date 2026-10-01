@@ -6,6 +6,8 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.util.Random;
+import main.com.otakuhangman.controller.LevelProgressState;
+import main.com.otakuhangman.controller.LevelResolution;
 import main.com.otakuhangman.gui.Screen;
 import main.com.otakuhangman.gui.utils.AsciiArt;
 
@@ -22,12 +24,13 @@ public class LevelResult extends Screen {
     private static final Color PANEL_BG = new Color(21, 21, 21);
 
     // --- State Variables ---
-    private boolean isWin;
+    private LevelProgressState state = LevelProgressState.ADVANCED;
+    private boolean isWin = true;
     private int score;
-    private int requiredScore;
-    private String rank;
-    private int completedChallenges = 7;
-    private int totalChallenges = 7;
+    private int requiredScore = 1;
+    private String rank = "";
+    private int completedChallenges;
+    private int totalChallenges;
 
     // --- Animation & Utility ---
     private float timeTicks = 0;
@@ -41,11 +44,7 @@ public class LevelResult extends Screen {
     private Font fontStats;
 
 
-    public LevelResult(boolean isWin, int score, int requiredScore, String rank, Runnable onEnterPressed) {
-        this.isWin = isWin;
-        this.score = score;
-        this.requiredScore = requiredScore;
-        this.rank = rank;
+    public LevelResult(Runnable onEnterPressed) {
         this.onEnterPressed = onEnterPressed;
 
         setBackground(BG_COLOR);
@@ -81,6 +80,18 @@ public class LevelResult extends Screen {
                 repaint();
             }
         });
+    }
+
+    /** Loads the outcome of the level that just ended; call before showing this screen. */
+    public void showResult(LevelResolution resolution, String rank) {
+        this.state = resolution.state();
+        this.isWin = resolution.state() != LevelProgressState.RETRY;
+        this.score = resolution.levelScore();
+        this.requiredScore = Math.max(1, resolution.requiredScore());
+        this.completedChallenges = resolution.completedChallenges();
+        this.totalChallenges = resolution.totalChallenges();
+        this.rank = rank;
+        repaint();
     }
 
     // ==========================================
@@ -122,11 +133,16 @@ public class LevelResult extends Screen {
         Color themeColor = isWin ? CYAN : RED;
 
         // --- 1. HEADER ---
-        int currentY = 120;
+        int currentY = 90;
 
 
         g2.setFont(fontTitle);
-        String mainTitle = isWin ? "PARABÉNS!" : "NÍVEL NÃO COMPLETADO";
+        String mainTitle = switch (state) {
+            case ADVANCED -> "PARABÉNS!";
+            case ISFORGIVING -> "NÍVEL CONCLUÍDO";
+            case GAME_COMPLETED -> "JOGO COMPLETO!";
+            case RETRY -> "NÍVEL NÃO COMPLETADO";
+        };
 
         // Glitch / Glow Effect
         if (isWin) {
@@ -155,9 +171,9 @@ public class LevelResult extends Screen {
         g2.drawLine(centerX - 60, currentY, centerX + 60, currentY);
 
         // --- 2. MAIN RPG BOX ---
-        currentY += 50;
+        currentY += 35;
         int boxW = 860;
-        int boxH = 420;
+        int boxH = 340;
         int boxX = centerX - (boxW / 2);
 
         g2.setColor(BORDER_DARK);
@@ -214,7 +230,7 @@ public class LevelResult extends Screen {
         g2.setColor(BORDER_DARK);
         g2.drawRect(rightStartX, scoreCellY, scoreCellW, cellH);
 
-        if (!isWin) {
+        if (!isWin || state == LevelProgressState.ISFORGIVING) {
             g2.setColor(new Color(RED.getRed(), RED.getGreen(), RED.getBlue(), 80));
             int barWidth = (int) (scoreCellW * ((double) score / requiredScore));
             g2.fillRect(rightStartX, scoreCellY + cellH - 4, Math.min(barWidth, scoreCellW), 4);
@@ -227,7 +243,7 @@ public class LevelResult extends Screen {
         g2.setColor(isWin ? CYAN : RED);
         g2.drawString(String.format("%,d", score) + " PTS", rightStartX + 15, scoreCellY + 50);
 
-        if (!isWin) {
+        if (!isWin || state == LevelProgressState.ISFORGIVING) {
             g2.setFont(fontMono.deriveFont(14f));
             g2.setColor(YELLOW);
             String reqStr = "REQUIREMENT";
@@ -246,7 +262,15 @@ public class LevelResult extends Screen {
         g2.fillRect(rightStartX, msgY, 3, 40);
 
         g2.setFont(fontMono.deriveFont(15f));
-        if (isWin) {
+        if (state == LevelProgressState.GAME_COMPLETED) {
+            g2.setColor(GREEN);
+            g2.drawString("Você completou todos os níveis! Sayonara!", rightStartX + 15, msgY + 25);
+        } else if (state == LevelProgressState.ISFORGIVING) {
+            g2.setColor(YELLOW);
+            g2.drawString("Requisitos não atingidos, mas este é um nível de aprendizado.", rightStartX + 8, msgY + 15);
+            g2.setColor(GREEN);
+            g2.drawString("Você pode continuar!", rightStartX + 10, msgY + 35);
+        } else if (isWin) {
             g2.setColor(Color.LIGHT_GRAY);
             g2.drawString("Você venceu! ", rightStartX + 15, msgY + 25);
             g2.setColor(GREEN);
@@ -260,14 +284,14 @@ public class LevelResult extends Screen {
         }
 
         // --- 5. FOOTER (ARROW & ENTER BOX) ---
-        int footerY = currentY + boxH + 50;
+        int footerY = currentY + boxH + 35;
 
         int arrowOffset = (int) (Math.sin(timeTicks * 2) * 8);
         g2.setFont(fontTitle.deriveFont(24f));
         g2.setColor(themeColor);
         drawCenteredString(g2, "↓", centerX, footerY + arrowOffset);
 
-        footerY += 40;
+        footerY += 30;
         int btnW = 380;
         int btnH = 45;
         int btnX = centerX - (btnW / 2);
@@ -286,7 +310,11 @@ public class LevelResult extends Screen {
         }
 
         g2.setFont(fontMono.deriveFont(Font.BOLD, 13f));
-        String prompt = isWin ? "PRESSIONE [ENTER] PARA CONTINUAR" : "PRESSIONE [ENTER] PARA TENTAR NOVAMENTE";
+        String prompt = switch (state) {
+            case GAME_COMPLETED -> "PRESSIONE [ENTER] PARA VOLTAR AO MENU";
+            case RETRY -> "PRESSIONE [ENTER] PARA TENTAR NOVAMENTE";
+            default -> "PRESSIONE [ENTER] PARA CONTINUAR";
+        };
         drawCenteredString(g2, prompt, centerX, footerY + 28);
 
         drawScanlines(g2, width, height);

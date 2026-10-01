@@ -20,9 +20,9 @@ public class RankAchieved extends Screen {
     private static final Color DIM = new Color(90, 90, 90);
 
     // --- State & Logic ---
-    private final Rank newRank;
+    private Rank newRank = Rank.OTAKU_INICIANTE;
     private final Runnable onEnterPressed;
-    private final String fullMessage;
+    private String fullMessage;
 
     // --- Animations ---
     private Timer timer;
@@ -48,8 +48,7 @@ public class RankAchieved extends Screen {
     private final Font fontMono = new Font("Monospaced", Font.PLAIN, 16);
     private final Font fontTitle = new Font(Font.SANS_SERIF, Font.BOLD, 65);
 
-    public RankAchieved(Rank newRank, Runnable onEnterPressed) {
-        this.newRank = newRank;
+    public RankAchieved(Runnable onEnterPressed) {
         this.onEnterPressed = onEnterPressed;
 
         this.fullMessage = getRankMessage(newRank);
@@ -99,6 +98,16 @@ public class RankAchieved extends Screen {
                 }
             }
         });
+    }
+
+    /** Loads the rank that was just reached and restarts the typewriter; call before showing this screen. */
+    public void setRank(Rank rank) {
+        this.newRank = rank;
+        this.fullMessage = getRankMessage(rank);
+        typewriterIndex = 0;
+        typeDelayTicks = 60;
+        typeTick = 0;
+        repaint();
     }
 
     @Override

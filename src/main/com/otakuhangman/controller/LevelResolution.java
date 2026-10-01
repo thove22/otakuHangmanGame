@@ -6,6 +6,7 @@ public record LevelResolution(
         int levelScore,
         int completedChallenges,
         int totalChallenges,
+        int requiredScore,
         String requirements
 ) {
 }
