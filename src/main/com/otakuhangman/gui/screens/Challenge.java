@@ -278,6 +278,7 @@ public class Challenge extends Screen {
             case ORDER_MISTAKE -> setFeedback("Wrong order!", true);
             case REPEATED -> setFeedback("Letter already tried", true);
             case TIME_UP -> setFeedback("Time is up!", true);
+            case CHALLENGE_OVER -> setFeedback("Challenge already finished", true);
         }
     }
     private void refreshFromControllerState(){

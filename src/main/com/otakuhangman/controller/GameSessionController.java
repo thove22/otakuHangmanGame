@@ -9,6 +9,7 @@ public class GameSessionController {
     private int currentLevelIndex;
     private int currentChallengeIndex;
     private Challenge currentChallenge;
+    private ChallengeResolution currentResolution;
 
 
     public void startNewGame(String playerName){
@@ -21,9 +22,14 @@ public class GameSessionController {
 
     public void prepareChallengeForCurrentLevl(){
         currentChallengeIndex = 0;
+        loadCurrentChallenge();
+    }
+
+    private void loadCurrentChallenge(){
         currentChallenge = getCurrentLevel().getChallenges().get(currentChallengeIndex);
         currentChallenge.reset();
         currentChallenge.startTimer();
+        currentResolution = null;
     }
 
     public AttemptResult submitGuess(char letter){
@@ -41,6 +47,10 @@ public class GameSessionController {
         if(!currentChallenge.isComplete()){
            throw  new IllegalStateException("Current Challenge is not complete yet");
         }
+        // Points must only be awarded once per challenge, however many times this is called.
+        if (currentResolution != null){
+            return currentResolution;
+        }
         EndChallengeReason endReason = currentChallenge.getEndReason();
 
         int pointsEarned = switch (endReason){
@@ -48,11 +58,12 @@ public class GameSessionController {
             case TIME_UP , ATTEMPS_LIMIT , ERROR_LIMIT -> currentPlayer.processChallengesResult(6);
         };
 
-        return new ChallengeResolution(endReason == EndChallengeReason.WON,
+        currentResolution = new ChallengeResolution(endReason == EndChallengeReason.WON,
                 currentChallenge.getWord(),
                 endReason,
                 pointsEarned,
                 currentPlayer.getPlayerStatus());
+        return currentResolution;
     }
     public boolean advanceNextChallenge(){
         ensureSessionStarted();
@@ -61,9 +72,7 @@ public class GameSessionController {
             return false;
         }
         currentChallengeIndex++;
-        currentChallenge = getCurrentLevel().getChallenges().get(currentChallengeIndex);
-        currentChallenge.reset();
-        currentChallenge.startTimer();
+        loadCurrentChallenge();
         return true;
     }
 
@@ -86,20 +95,26 @@ public class GameSessionController {
         Level currentLevel = getCurrentLevel();
         boolean passed = currentLevel.canAdvanceToNextLevel(currentPlayer);
         String requeriments = printLevelRequirements(currentLevel);
+        // Capture the level stats before advanceToNextLevel() resets them.
+        int levelScore = currentPlayer.getCurrentLevelScore();
+        int completedChallenges = currentPlayer.getCompletedChallenges();
 
         LevelProgressState state;
 
-        if (passed){
-            currentLevelIndex++;
-            currentPlayer.advanceToNextLevel();
-            prepareChallengeForCurrentLevl();
-            state = LevelProgressState.ADVANCED;
-        }else if(isForgivingLevel(currentLevel)){
-            currentLevelIndex++;
-            currentPlayer.advanceToNextLevel();
-            state = LevelProgressState.ISFORGIVING;
+        if (passed || isForgivingLevel(currentLevel)){
+            state = passed ? LevelProgressState.ADVANCED : LevelProgressState.ISFORGIVING;
+            if (currentLevelIndex + 1 >= levels.size()){
+                state = LevelProgressState.GAME_COMPLETED;
+            }else {
+                currentLevelIndex++;
+                currentPlayer.advanceToNextLevel();
+                prepareChallengeForCurrentLevl();
+            }
         }else {
             currentLevel.resetLevel();
+            currentPlayer.setCurrentLevelScore(0);
+            currentPlayer.setCompletedChallenges(0);
+            currentPlayer.setCurrentStreak(0);
             prepareChallengeForCurrentLevl();
             state = LevelProgressState.RETRY;
         }
@@ -107,8 +122,8 @@ public class GameSessionController {
         return new LevelResolution(
                 state,
                 currentLevel.getLevelNumber(),
-                currentPlayer.getCurrentLevelScore(),
-                currentPlayer.getCompletedChallenges(),
+                levelScore,
+                completedChallenges,
                 currentLevel.getChallenges().size(),
                 requeriments
         );
@@ -133,7 +148,7 @@ public class GameSessionController {
         return levels.get(currentLevelIndex);
     }
     private boolean isForgivingLevel(Level level) {
-        return level.getLevelNumber() >= 4;
+        return level.getLevelNumber() <= 3;
     }
     private String printLevelRequirements(Level level) {
         return "Requisitos: " + "\n" +

@@ -5,5 +5,6 @@ public enum AttemptResult {
     WRONG,
     ORDER_MISTAKE,
     TIME_UP,
-    REPEATED
+    REPEATED,
+    CHALLENGE_OVER
 }

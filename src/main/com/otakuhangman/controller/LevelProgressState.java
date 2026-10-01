@@ -3,5 +3,6 @@ package main.com.otakuhangman.controller;
 public enum LevelProgressState {
     ADVANCED,
     ISFORGIVING,
-    RETRY
+    RETRY,
+    GAME_COMPLETED
 }

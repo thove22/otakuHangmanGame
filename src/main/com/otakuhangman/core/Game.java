@@ -136,6 +136,9 @@ public class Game {
                         case TIME_UP -> {
                             System.out.println("Tempo Esgotado!");
                         }
+                        case CHALLENGE_OVER -> {
+                            System.out.println("Desafio já terminado!");
+                        }
                     }
 
                     System.out.println("Letras Tentadas: " + challenge.getTriedLettersString());
@@ -185,6 +188,7 @@ public class Game {
             }
             if (input.length() != 1){
                 System.out.println("Insira apenas uma letra.");
+                continue;
             }
             char letter =  input.charAt(0);
 
@@ -229,7 +233,7 @@ public class Game {
     }
 
     boolean isForgivingLevel(Level level){
-        return level.getLevelNumber() >= 4;
+        return level.getLevelNumber() <= 3;
     }
     void drawHangMan(int errors){
         if (errors < 0 || errors > 6){
