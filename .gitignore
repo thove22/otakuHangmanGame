@@ -1,0 +1,12 @@
+# IntelliJ build output
+out/
+*.class
+
+# IntelliJ per-user files
+.idea/workspace.xml
+.idea/shelf/
+.idea/usage.statistics.xml
+
+# OS files
+.DS_Store
+Thumbs.db

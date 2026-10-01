@@ -1,6 +1,8 @@
 package main.com.otakuhangman.controller;
 import main.com.otakuhangman.core.*;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class GameSessionController {
@@ -30,6 +32,12 @@ public class GameSessionController {
         currentChallenge.reset();
         currentChallenge.startTimer();
         currentResolution = null;
+    }
+
+    /** Restarts the clock of the current challenge, e.g. when its screen is actually shown. */
+    public void startCurrentChallengeTimer(){
+        ensureSessionStarted();
+        currentChallenge.startTimer();
     }
 
     public AttemptResult submitGuess(char letter){
@@ -78,10 +86,12 @@ public class GameSessionController {
 
     public ChallengeViewState getCurrentChallengeState(){
         ensureSessionStarted();
+        List<Character> triedLetters = new ArrayList<>(currentChallenge.getTriedLetters());
+        Collections.sort(triedLetters);
         return new ChallengeViewState(
                 currentChallenge.getHint(),
                 currentChallenge.getMaskedWord(),
-                currentChallenge.getTriedLettersString(),
+                triedLetters,
                 currentChallenge.getCurrentErrors(),
                 currentChallenge.getAttemps(),
                 currentChallenge.getMaxAttemps(),
@@ -125,6 +135,7 @@ public class GameSessionController {
                 levelScore,
                 completedChallenges,
                 currentLevel.getChallenges().size(),
+                currentLevel.getRequiredScoreToPass(),
                 requeriments
         );
     }
@@ -136,6 +147,14 @@ public class GameSessionController {
     public int getCurrentLevelIndex(){
         ensureSessionStarted();
         return currentLevelIndex;
+    }
+    public int getTotalLevels(){
+        ensureSessionStarted();
+        return levels.size();
+    }
+    public int getCurrentLevelChallengeCount(){
+        ensureSessionStarted();
+        return getCurrentLevel().getChallenges().size();
     }
     public int getCurrentChallengeIndex() {
         ensureSessionStarted();
